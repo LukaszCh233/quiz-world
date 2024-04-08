@@ -32,6 +32,7 @@ public class Admin implements UserDetails {
 
         return authorities;
     }
+
     @Override
     public String getPassword() {
         return password;
