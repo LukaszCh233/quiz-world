@@ -45,7 +45,8 @@ public class UserServiceImpl {
                         .map(this::mapUserToUserDTO)
                         .toList();
     }
-    public UserDTO  mapUserToUserDTO(User user) {
+
+    public UserDTO mapUserToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());

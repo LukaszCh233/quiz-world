@@ -16,6 +16,7 @@ public class AdminServiceImpl {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
     }
+
     public Admin createAdmin(Admin admin) {
 
         adminRepository.findByEmail(admin.getEmail());
@@ -25,6 +26,7 @@ public class AdminServiceImpl {
         admin.setPassword(encodedPassword);
         return adminRepository.save(admin);
     }
+
     public AdminDTO mapAdminToAdminDTO(Admin admin) {
         AdminDTO adminDTO = new AdminDTO();
         adminDTO.setId(admin.getId());
