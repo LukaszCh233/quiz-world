@@ -15,23 +15,25 @@ import java.util.List;
 public class UserServiceImpl {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MapEntity mapEntity;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, MapEntity mapEntity) {
 
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mapEntity = mapEntity;
     }
 
-    public User createUser(User user) {
-
-        userRepository.findByEmail(user.getEmail()).ifPresent(existingUser -> {
-            throw new ExistsException("User exists");
-        });
+    public UserDTO createUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new ExistsException("User with this email is registered");
+        }
 
         user.setRole(Role.USER);
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        return userRepository.save(user);
+        User createUser = userRepository.save(user);
+        return mapEntity.mapUserToUserDTO(createUser);
     }
 
     public List<UserDTO> findAllUsers() {
@@ -42,16 +44,9 @@ public class UserServiceImpl {
         }
         return
                 users.stream()
-                        .map(this::mapUserToUserDTO)
+                        .map(mapEntity::mapUserToUserDTO)
                         .toList();
-    }
 
-    public UserDTO mapUserToUserDTO(User user) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setName(user.getName());
-        userDTO.setEmail(user.getEmail());
-        return userDTO;
     }
 }
 

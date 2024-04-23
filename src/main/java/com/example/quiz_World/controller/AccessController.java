@@ -44,17 +44,17 @@ public class AccessController {
     }
 
     @PostMapping("/userReg")
-    ResponseEntity<?> registerCustomer(@RequestBody User user) {
-        User createUser = userService.createUser(user);
-        UserDTO userDTO = userService.mapUserToUserDTO(createUser);
-        logger.info("User registered successfully: {}", createUser.getEmail());
-        return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    ResponseEntity<UserDTO> registerCustomer(@RequestBody User user) {
+        UserDTO createUserDTO = userService.createUser(user);
+
+        logger.info("User registered successfully: {}", createUserDTO.getEmail());
+        return new ResponseEntity<>(createUserDTO, HttpStatus.OK);
     }
 
     @PostMapping("/userLog")
     ResponseEntity<?> loginCustomer(@RequestBody User user) {
         User registeredUser = userRepository.findByEmail(user.getEmail()).orElseThrow(()
-                -> new EntityNotFoundException("Customer not exists"));
+                -> new EntityNotFoundException("User not exists"));
 
         if (!passwordEncoder.matches(user.getPassword(), registeredUser.getPassword())) {
             throw new IncorrectPasswordException("Incorrect email or password");
@@ -65,12 +65,12 @@ public class AccessController {
     }
 
     @PostMapping("/adminReg")
-    ResponseEntity<?> registerAdmin(@RequestBody Admin admin) {
+    ResponseEntity<AdminDTO> registerAdmin(@RequestBody Admin admin) {
 
-        Admin createAdmin = adminService.createAdmin(admin);
-        AdminDTO adminDTO = adminService.mapAdminToAdminDTO(createAdmin);
-        logger.info("User registered successfully: {}", createAdmin.getEmail());
-        return new ResponseEntity<>(adminDTO, HttpStatus.OK);
+        AdminDTO createAdmin = adminService.createAdmin(admin);
+
+        logger.info("Admin registered successfully: {}", createAdmin.getEmail());
+        return new ResponseEntity<>(createAdmin, HttpStatus.OK);
     }
 
     @PostMapping("/adminLog")
