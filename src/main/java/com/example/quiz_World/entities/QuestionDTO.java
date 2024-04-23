@@ -8,4 +8,5 @@ import java.util.List;
 public class QuestionDTO {
     private String questionContent;
     private List<AnswerDTO> answers;
+    private Long questionNumber;
 }

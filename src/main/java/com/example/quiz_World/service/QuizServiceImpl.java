@@ -7,107 +7,116 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class QuizServiceImpl {
     private final QuizRepository quizRepository;
-    private final AnswersRepository answersRepository;
-    private final QuestionsRepository questionsRepository;
-    private final CategoryRepository categoryRepository;
+    private final QuestionRepository questionRepository;
+    private final CategoryQuizRepository categoryQuizRepository;
     private final UserRepository userRepository;
-    private final QuizResultRepository quizResultRepository;
+    private final ResultRepository resultRepository;
+    private final MapEntity mapEntity;
 
-    public QuizServiceImpl(QuizRepository quizRepository, AnswersRepository answersRepository,
-                           QuestionsRepository questionsRepository, CategoryRepository categoryRepository,
-                           UserRepository userRepository, QuizResultRepository quizResultRepository) {
+    public QuizServiceImpl(QuizRepository quizRepository, QuestionRepository questionRepository,
+                           CategoryQuizRepository categoryQuizRepository, UserRepository userRepository,
+                           ResultRepository resultRepository, MapEntity mapEntity) {
         this.quizRepository = quizRepository;
-        this.answersRepository = answersRepository;
-        this.questionsRepository = questionsRepository;
-        this.categoryRepository = categoryRepository;
+        this.questionRepository = questionRepository;
+        this.categoryQuizRepository = categoryQuizRepository;
         this.userRepository = userRepository;
-        this.quizResultRepository = quizResultRepository;
+        this.resultRepository = resultRepository;
+        this.mapEntity = mapEntity;
     }
 
-    public Quiz createQuiz(String title, Long categoryId, Status status, Principal principal) {
+    public QuizDTO createQuiz(String title, CategoryQuiz categoryQuiz, Status status, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
 
-
-        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
         Quiz quiz = new Quiz();
-        quiz.setUserId(user.getId());
         quiz.setTitle(title);
-        quiz.setCategory(category);
+        quiz.setCategoryQuiz(categoryQuiz);
+        quiz.setUserId(user.getId());
         quiz.setStatus(status);
 
-
-        return quizRepository.save(quiz);
+        quizRepository.save(quiz);
+        return mapEntity.mapQuizToQuizDTO(quiz);
     }
 
-    @Transactional
     public void addQuestionsToQuiz(Long quizId, Question question) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
         question.setQuiz(quiz);
-
-        question.getAnswers().forEach(answer -> answer.setQuestion(question));
-
+        question.getAnswerToQuizQuestions().forEach(answer -> answer.setQuestion(question));
         quiz.getQuestions().add(question);
 
         quizRepository.save(quiz);
-
     }
-
 
     public List<QuizDTO> findAllPublicQuizzes() {
         List<Quiz> quizList = quizRepository.findByStatus(Status.PUBLIC);
         if (quizList.isEmpty()) {
             throw new EntityNotFoundException("List is empty");
         }
-        return mapQuizzesToQuizzesDTO(quizList);
+        return mapEntity.mapQuizzesToQuizzesDTO(quizList);
     }
 
     public List<QuizDTO> findYourQuizzes(Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        List<Quiz> quizList = quizRepository.findQuizzesByUserId(user.getId());
+        List<Quiz> quizList = quizRepository.findByUserId(user.getId());
         if (quizList.isEmpty()) {
             throw new EntityNotFoundException("Not found quizzes");
         }
-        return mapQuizzesToQuizzesDTO(quizList);
-
+        return mapEntity.mapQuizzesToQuizzesDTO(quizList);
     }
 
     public QuizDTO findQuizById(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
-        return mapQuizToQuizDTO(quiz);
+        if (quiz.getStatus().equals(Status.PRIVATE)) {
+            throw new EntityNotFoundException("Quiz not found");
+        }
+        return mapEntity.mapQuizToQuizDTO(quiz);
+    }
+
+    public List<QuizDTO> findQuizByCategoryId(Long categoryId) {
+        List<Quiz> quizList = quizRepository.findByCategoryQuizId(categoryId);
+        if (quizList.isEmpty()) {
+            throw new EntityNotFoundException("Not found quiz with this category");
+        }
+        return mapEntity.mapQuizzesToQuizzesDTO(quizList);
     }
 
     public List<QuestionDTO> findQuestionsByQuizId(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
+        if (quiz.getStatus().equals(Status.PRIVATE)) {
+            throw new EntityNotFoundException("Quiz not found");
+        }
         List<Question> questionsList = quiz.getQuestions();
         if (questionsList.isEmpty()) {
             throw new EntityNotFoundException("Quiz is empty");
         }
 
-        return mapQuestionsToQuestionDTO(questionsList);
+        return mapEntity.mapQuestionsToQuestionsDTO(questionsList);
     }
 
-    public void deleteAllQuiz(Principal principal) {
+    @Transactional
+    public void deleteAllQuizzesForUser(Principal principal) {
         List<Quiz> quizList = findQuizzesByUserPrincipal(principal);
 
         if (quizList.isEmpty()) {
             throw new EntityNotFoundException("List is empty");
         }
+        for (Quiz quiz : quizList) {
+            resultRepository.deleteByQuiz(quiz);
+        }
         quizRepository.deleteAll(quizList);
     }
 
-    public void deleteQuizById(Long id, Principal principal) {
+    @Transactional
+    public void deleteQuizByIdForUser(Long id, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -115,10 +124,25 @@ public class QuizServiceImpl {
         if (!quizToDelete.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
+        resultRepository.deleteByQuiz(quizToDelete);
+
         quizRepository.delete(quizToDelete);
     }
 
-    public void updateQuizById(Long id, Quiz quiz, Principal principal) {
+    public void deleteQuestionByNumberQuestionForUser(Long quizId, Long numberQuestion, Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz nor found"));
+        if (!quiz.getUserId().equals(user.getId())) {
+            throw new UnsupportedOperationException("User is not authorized to delete this quiz");
+        }
+        Question question = questionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
+
+        questionRepository.delete(question);
+    }
+
+    public void updateQuizByIdForUser(Long id, Quiz quiz, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -126,18 +150,19 @@ public class QuizServiceImpl {
         if (!quizToUpdate.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
-        if (quiz.getCategory() == null) {
-            throw new IllegalArgumentException("Category cannot be null");
+        if (quiz.getCategoryQuiz() == null) {
+            throw new IllegalArgumentException("CategoryQuiz cannot be null");
         }
-        Category category = categoryRepository.findById(quiz.getCategory().getId()).orElseThrow(() -> new EntityNotFoundException("category not exists"));
+        CategoryQuiz categoryQuiz = categoryQuizRepository.findById(quiz.getCategoryQuiz().getId()).orElseThrow(() -> new EntityNotFoundException("categoryQuiz not exists"));
 
         quizToUpdate.setTitle(quiz.getTitle());
-        quizToUpdate.setCategory(category);
+        quizToUpdate.setCategoryQuiz(categoryQuiz);
+        quizToUpdate.setStatus(quiz.getStatus());
 
         quizRepository.save(quizToUpdate);
     }
 
-    public void updateQuestion(Long quizId, Long questionId, Question question, Principal principal) {
+    public void updateQuestionForUser(Long quizId, Long questionNumber, Question question, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -146,121 +171,148 @@ public class QuizServiceImpl {
         if (!quiz.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
-        Question questionToUpdate = questionsRepository.findById(questionId).orElseThrow(() -> new EntityNotFoundException("Not found"));
+        Question questionToUpdate = questionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         questionToUpdate.setContent(question.getContent());
 
-        questionToUpdate.getAnswers().clear();
+        questionToUpdate.getAnswerToQuizQuestions().clear();
 
-        for (Answer answer : question.getAnswers()) {
-            answer.setQuestion(questionToUpdate);
-            questionToUpdate.getAnswers().add(answer);
+        for (AnswerToQuizQuestion answerToQuizQuestion : question.getAnswerToQuizQuestions()) {
+            answerToQuizQuestion.setQuestion(questionToUpdate);
+            questionToUpdate.getAnswerToQuizQuestions().add(answerToQuizQuestion);
         }
 
-        questionsRepository.save(questionToUpdate);
+        questionRepository.save(questionToUpdate);
+    }
+
+    public void updateQuestionForAdmin(Long quizId, Long questionNumber, Question question) {
+
+        Question questionToUpdate = questionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
+
+        questionToUpdate.setContent(question.getContent());
+
+        questionToUpdate.getAnswerToQuizQuestions().clear();
+
+        for (AnswerToQuizQuestion answerToQuizQuestion : question.getAnswerToQuizQuestions()) {
+            answerToQuizQuestion.setQuestion(questionToUpdate);
+            questionToUpdate.getAnswerToQuizQuestions().add(answerToQuizQuestion);
+        }
+    }
+
+    public void updateQuizByIdForAdmin(Long id, Quiz quiz) {
+        Quiz quizToUpdate = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
+
+        if (quiz.getCategoryQuiz() == null) {
+            throw new IllegalArgumentException("CategoryQuiz cannot be null");
+        }
+        CategoryQuiz categoryQuiz = categoryQuizRepository.findById(quiz.getCategoryQuiz().getId()).orElseThrow(() -> new EntityNotFoundException("categoryQuiz not exists"));
+
+        quizToUpdate.setTitle(quiz.getTitle());
+        quizToUpdate.setCategoryQuiz(categoryQuiz);
+        quizToUpdate.setStatus(quiz.getStatus());
+
+        quizRepository.save(quizToUpdate);
+    }
+
+    public void deleteQuestionByNumberQuestionForAdmin(Long quizId, Long numberQuestion) {
+
+        Question question = questionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
+
+        questionRepository.delete(question);
     }
 
     public List<Quiz> findQuizzesByUserPrincipal(Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        return Optional.ofNullable(quizRepository.findQuizzesByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found quizzes"));
+        return Optional.ofNullable(quizRepository.findByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found quizzes"));
 
     }
 
-    public double solveQuiz(Long quizId, List<Answer> userAnswers, Principal principal) {
+    public double solveQuiz(Long quizId, List<AnswerToQuizQuestion> userAnswerToQuizQuestions, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
         List<Question> questions = quiz.getQuestions();
-        if (userAnswers.size() != questions.size()) {
+        if (userAnswerToQuizQuestions.size() != questions.size()) {
             throw new IllegalArgumentException("Number of answers user does not match with questions");
         }
+        Result previousResult = resultRepository.findByUserIdAndQuizId(user.getId(), quizId);
 
         int correctAnswersCount = 0;
 
         for (int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
-            Answer userAnswer = userAnswers.get(i);
-            if (isCorrectAnswer(question, userAnswer)) {
+            AnswerToQuizQuestion userAnswerToQuizQuestion = userAnswerToQuizQuestions.get(i);
+            if (isCorrectAnswer(question, userAnswerToQuizQuestion)) {
                 correctAnswersCount++;
             }
         }
         double score = (double) correctAnswersCount / questions.size() * 100;
+        if (previousResult == null || score > previousResult.getScore()) {
 
-        QuizResult quizResult = new QuizResult();
-        quizResult.setUser(user);
-        quizResult.setScore(score);
-        quizResult.setQuiz(quiz);
-
-        quizResultRepository.save(quizResult);
+            Result result = new Result();
+            result.setUser(user);
+            result.setScore(score);
+            result.setQuiz(quiz);
+            resultRepository.save(result);
+        }
+        if (previousResult != null && score > previousResult.getScore()) {
+            resultRepository.delete(previousResult);
+        }
         return score;
     }
 
-    private boolean isCorrectAnswer(Question question, Answer userAnswer) {
-        Answer correctAnswer = null;
-        for (Answer answer : question.getAnswers()) {
-            if (answer.isCorrect()) {
-                correctAnswer = answer;
+    private boolean isCorrectAnswer(Question question, AnswerToQuizQuestion userAnswerToQuizQuestion) {
+        AnswerToQuizQuestion correctAnswerToQuizQuestion = null;
+        for (AnswerToQuizQuestion answerToQuizQuestion : question.getAnswerToQuizQuestions()) {
+            if (answerToQuizQuestion.isCorrect()) {
+                correctAnswerToQuizQuestion = answerToQuizQuestion;
                 break;
 
             }
         }
-        if (correctAnswer == null) {
+        if (correctAnswerToQuizQuestion == null) {
             return false;
         }
-        return userAnswer.getAnswerNumber().equals(correctAnswer.getAnswerNumber());
+        return userAnswerToQuizQuestion.getAnswerNumber().equals(correctAnswerToQuizQuestion.getAnswerNumber());
 
     }
 
-    public QuizDTO mapQuizToQuizDTO(Quiz quiz) {
+    public List<QuizResultDTO> findQuizzesResults(Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        QuizDTO quizDTO = new QuizDTO();
-        quizDTO.setTitle(quiz.getTitle());
-        quizDTO.setCategory(quiz.getCategory().getName());
+        List<Result> results = resultRepository.findByUserId(user.getId());
+        if (results.isEmpty()) {
+            throw new EntityNotFoundException("Score list is empty");
+        }
 
-        return quizDTO;
+        return mapEntity.mapQuizResultsToQuizResultsDTO(results);
+
     }
 
-    public List<QuizDTO> mapQuizzesToQuizzesDTO(List<Quiz> quizList) {
-        List<QuizDTO> quizDTOS = new ArrayList<>();
+    @Transactional
+    public void deleteAllQuizzesForAdmin() {
+        List<Quiz> quizList = quizRepository.findAll();
+        if (quizList.isEmpty()) {
+            throw new EntityNotFoundException("Quiz list is empty");
+        }
         for (Quiz quiz : quizList) {
-            QuizDTO quizDTO = mapQuizToQuizDTO(quiz);
-            quizDTOS.add(quizDTO);
-
+            resultRepository.deleteByQuiz(quiz);
         }
-        return quizDTOS;
+        quizRepository.deleteAll(quizList);
     }
 
-    public List<QuestionDTO> mapQuestionsToQuestionDTO(List<Question> questionsList) {
-        List<QuestionDTO> questionDTOList = new ArrayList<>();
-        for (Question questions : questionsList) {
-            QuestionDTO questionDTO = mapQuestionToQuestionDTO(questions); // Mapuj każde pytanie na obiekt DTO
-            questionDTOList.add(questionDTO);
-        }
-        return questionDTOList;
-    }
+    @Transactional
+    public void deleteQuizByIdForAdmin(Long id) {
 
-    public QuestionDTO mapQuestionToQuestionDTO(Question questions) {
-        QuestionDTO questionDTO = new QuestionDTO();
-        questionDTO.setQuestionContent(questions.getContent());
+        Quiz quizToDelete = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz nor found"));
 
-        List<AnswerDTO> answerDTOList = mapAnswersToAnswerDTO(questions.getAnswers());
-        questionDTO.setAnswers(answerDTOList);
+        resultRepository.deleteByQuiz(quizToDelete);
 
-        return questionDTO;
-    }
-
-    public List<AnswerDTO> mapAnswersToAnswerDTO(List<Answer> answerList) {
-        List<AnswerDTO> answerDTOList = new ArrayList<>();
-        for (Answer answer : answerList) {
-            AnswerDTO answerDTO = new AnswerDTO();
-            answerDTO.setAnswerNumber(answer.getAnswerNumber());
-            answerDTO.setAnswerContent(answer.getContent());
-            answerDTOList.add(answerDTO);
-        }
-        return answerDTOList;
+        quizRepository.delete(quizToDelete);
     }
 }

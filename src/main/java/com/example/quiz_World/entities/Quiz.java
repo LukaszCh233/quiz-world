@@ -15,7 +15,7 @@ public class Quiz {
     private String title;
 
     @ManyToOne
-    private Category category;
+    private CategoryQuiz categoryQuiz;
 
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions;

@@ -12,10 +12,11 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long questionNumber;
     private String content;
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Answer> answers = new ArrayList<>();
+    private List<AnswerToQuizQuestion> answerToQuizQuestions = new ArrayList<>();
 }

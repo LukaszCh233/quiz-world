@@ -9,8 +9,11 @@ import java.util.List;
 
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
-    List<Quiz> findQuizzesByUserId(Long id);
+    List<Quiz> findByUserId(Long id);
 
     List<Quiz> findByStatus(Status status);
+
+    List<Quiz> findByCategoryQuizId(Long id);
+
 
 }
