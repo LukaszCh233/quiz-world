@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Answer {
+public class AnswerToQuizQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

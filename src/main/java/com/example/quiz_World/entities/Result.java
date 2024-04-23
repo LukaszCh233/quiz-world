@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class QuizResult {
+public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,6 +17,9 @@ public class QuizResult {
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
+    @ManyToOne
+    @JoinColumn(name = "wordSet_id")
+    private WordSet wordSet;
 
     private double score;
 }
