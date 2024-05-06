@@ -1,9 +1,9 @@
-package com.example.quiz_World.entities;
+package com.example.quiz_World.entities.quizEntity;
 
 import lombok.Data;
 
 @Data
-public class AnswerDTO {
+public class AnswerToQuizDTO {
     private Long answerNumber;
     private String answerContent;
 }

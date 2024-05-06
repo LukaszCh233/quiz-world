@@ -1,7 +1,7 @@
 package com.example.quiz_World.repository;
 
-import com.example.quiz_World.entities.Quiz;
 import com.example.quiz_World.entities.Status;
+import com.example.quiz_World.entities.quizEntity.Quiz;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +13,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findByStatus(Status status);
 
-    List<Quiz> findByCategoryQuizId(Long id);
+    List<Quiz> findByQuizCategoryId(Long id);
 
 
 }

@@ -1,13 +1,17 @@
-package com.example.quiz_World.entities;
+package com.example.quiz_World.entities.quizEntity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,5 +22,5 @@ public class Question {
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AnswerToQuizQuestion> answerToQuizQuestions = new ArrayList<>();
+    private List<AnswerToQuiz> answerToQuiz = new ArrayList<>();
 }

@@ -83,7 +83,7 @@ public class AccessController {
             throw new IncorrectPasswordException("Incorrect email or password");
         }
         String jwtToken = helpJwt.generateToken(registeredAdmin);
-        logger.info("User logged in successfully: {}", registeredAdmin.getEmail());
+        logger.info("Admin logged in successfully: {}", registeredAdmin.getEmail());
         return ResponseEntity.ok(jwtToken);
     }
 }

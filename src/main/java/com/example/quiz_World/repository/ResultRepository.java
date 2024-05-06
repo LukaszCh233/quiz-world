@@ -1,8 +1,8 @@
 package com.example.quiz_World.repository;
 
-import com.example.quiz_World.entities.Quiz;
 import com.example.quiz_World.entities.Result;
-import com.example.quiz_World.entities.WordSet;
+import com.example.quiz_World.entities.quizEntity.Quiz;
+import com.example.quiz_World.entities.wordSetEntity.WordSet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

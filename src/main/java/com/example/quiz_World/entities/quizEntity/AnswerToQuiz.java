@@ -1,11 +1,15 @@
-package com.example.quiz_World.entities;
+package com.example.quiz_World.entities.quizEntity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-public class AnswerToQuizQuestion {
+@AllArgsConstructor
+@NoArgsConstructor
+public class AnswerToQuiz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

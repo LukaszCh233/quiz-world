@@ -1,6 +1,10 @@
 package com.example.quiz_World.service;
 
-import com.example.quiz_World.entities.*;
+import com.example.quiz_World.entities.Result;
+import com.example.quiz_World.entities.ResultDTO;
+import com.example.quiz_World.entities.Status;
+import com.example.quiz_World.entities.User;
+import com.example.quiz_World.entities.quizEntity.*;
 import com.example.quiz_World.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -14,29 +18,29 @@ import java.util.Optional;
 public class QuizServiceImpl {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
-    private final CategoryQuizRepository categoryQuizRepository;
+    private final QuizCategoryRepository quizCategoryRepository;
     private final UserRepository userRepository;
     private final ResultRepository resultRepository;
     private final MapEntity mapEntity;
 
     public QuizServiceImpl(QuizRepository quizRepository, QuestionRepository questionRepository,
-                           CategoryQuizRepository categoryQuizRepository, UserRepository userRepository,
+                           QuizCategoryRepository quizCategoryRepository, UserRepository userRepository,
                            ResultRepository resultRepository, MapEntity mapEntity) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
-        this.categoryQuizRepository = categoryQuizRepository;
+        this.quizCategoryRepository = quizCategoryRepository;
         this.userRepository = userRepository;
         this.resultRepository = resultRepository;
         this.mapEntity = mapEntity;
     }
 
-    public QuizDTO createQuiz(String title, CategoryQuiz categoryQuiz, Status status, Principal principal) {
+    public QuizDTO createQuiz(String title, QuizCategory quizCategory, Status status, Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
 
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
-        quiz.setCategoryQuiz(categoryQuiz);
+        quiz.setQuizCategory(quizCategory);
         quiz.setUserId(user.getId());
         quiz.setStatus(status);
 
@@ -48,7 +52,7 @@ public class QuizServiceImpl {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
         question.setQuiz(quiz);
-        question.getAnswerToQuizQuestions().forEach(answer -> answer.setQuestion(question));
+        question.getAnswerToQuiz().forEach(answer -> answer.setQuestion(question));
         quiz.getQuestions().add(question);
 
         quizRepository.save(quiz);
@@ -63,8 +67,8 @@ public class QuizServiceImpl {
     }
 
     public List<QuizDTO> findYourQuizzes(Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         List<Quiz> quizList = quizRepository.findByUserId(user.getId());
         if (quizList.isEmpty()) {
@@ -82,7 +86,7 @@ public class QuizServiceImpl {
     }
 
     public List<QuizDTO> findQuizByCategoryId(Long categoryId) {
-        List<Quiz> quizList = quizRepository.findByCategoryQuizId(categoryId);
+        List<Quiz> quizList = quizRepository.findByQuizCategoryId(categoryId);
         if (quizList.isEmpty()) {
             throw new EntityNotFoundException("Not found quiz with this category");
         }
@@ -130,8 +134,8 @@ public class QuizServiceImpl {
     }
 
     public void deleteQuestionByNumberQuestionForUser(Long quizId, Long numberQuestion, Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz nor found"));
         if (!quiz.getUserId().equals(user.getId())) {
@@ -143,28 +147,28 @@ public class QuizServiceImpl {
     }
 
     public void updateQuizByIdForUser(Long id, Quiz quiz, Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         Quiz quizToUpdate = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
         if (!quizToUpdate.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
-        if (quiz.getCategoryQuiz() == null) {
-            throw new IllegalArgumentException("CategoryQuiz cannot be null");
+        if (quiz.getQuizCategory() == null) {
+            throw new IllegalArgumentException("Quiz category cannot be null");
         }
-        CategoryQuiz categoryQuiz = categoryQuizRepository.findById(quiz.getCategoryQuiz().getId()).orElseThrow(() -> new EntityNotFoundException("categoryQuiz not exists"));
+        QuizCategory quizCategory = quizCategoryRepository.findById(quiz.getQuizCategory().getId()).orElseThrow(() -> new EntityNotFoundException("Category not exists"));
 
         quizToUpdate.setTitle(quiz.getTitle());
-        quizToUpdate.setCategoryQuiz(categoryQuiz);
+        quizToUpdate.setQuizCategory(quizCategory);
         quizToUpdate.setStatus(quiz.getStatus());
 
         quizRepository.save(quizToUpdate);
     }
 
-    public void updateQuestionForUser(Long quizId, Long questionNumber, Question question, Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+    public void updateQuestionByQuestionNumberForUser(Long quizId, Long questionNumber, Question question, Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
@@ -175,68 +179,65 @@ public class QuizServiceImpl {
 
         questionToUpdate.setContent(question.getContent());
 
-        questionToUpdate.getAnswerToQuizQuestions().clear();
+        questionToUpdate.getAnswerToQuiz().clear();
 
-        for (AnswerToQuizQuestion answerToQuizQuestion : question.getAnswerToQuizQuestions()) {
-            answerToQuizQuestion.setQuestion(questionToUpdate);
-            questionToUpdate.getAnswerToQuizQuestions().add(answerToQuizQuestion);
+        for (AnswerToQuiz answerToQuiz : question.getAnswerToQuiz()) {
+            answerToQuiz.setQuestion(questionToUpdate);
+            questionToUpdate.getAnswerToQuiz().add(answerToQuiz);
         }
-
         questionRepository.save(questionToUpdate);
     }
 
-    public void updateQuestionForAdmin(Long quizId, Long questionNumber, Question question) {
-
+    public void updateQuestionByQuestionNumberForAdmin(Long quizId, Long questionNumber, Question question) {
         Question questionToUpdate = questionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         questionToUpdate.setContent(question.getContent());
 
-        questionToUpdate.getAnswerToQuizQuestions().clear();
+        questionToUpdate.getAnswerToQuiz().clear();
 
-        for (AnswerToQuizQuestion answerToQuizQuestion : question.getAnswerToQuizQuestions()) {
-            answerToQuizQuestion.setQuestion(questionToUpdate);
-            questionToUpdate.getAnswerToQuizQuestions().add(answerToQuizQuestion);
+        for (AnswerToQuiz answerToQuiz : question.getAnswerToQuiz()) {
+            answerToQuiz.setQuestion(questionToUpdate);
+            questionToUpdate.getAnswerToQuiz().add(answerToQuiz);
         }
+        questionRepository.save(questionToUpdate);
     }
 
     public void updateQuizByIdForAdmin(Long id, Quiz quiz) {
         Quiz quizToUpdate = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
-        if (quiz.getCategoryQuiz() == null) {
-            throw new IllegalArgumentException("CategoryQuiz cannot be null");
+        if (quiz.getQuizCategory() == null) {
+            throw new IllegalArgumentException("QuizCategory cannot be null");
         }
-        CategoryQuiz categoryQuiz = categoryQuizRepository.findById(quiz.getCategoryQuiz().getId()).orElseThrow(() -> new EntityNotFoundException("categoryQuiz not exists"));
+        QuizCategory quizCategory = quizCategoryRepository.findById(quiz.getQuizCategory().getId()).orElseThrow(() -> new EntityNotFoundException("Quiz category not exists"));
 
         quizToUpdate.setTitle(quiz.getTitle());
-        quizToUpdate.setCategoryQuiz(categoryQuiz);
+        quizToUpdate.setQuizCategory(quizCategory);
         quizToUpdate.setStatus(quiz.getStatus());
 
         quizRepository.save(quizToUpdate);
     }
 
     public void deleteQuestionByNumberQuestionForAdmin(Long quizId, Long numberQuestion) {
-
         Question question = questionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
 
         questionRepository.delete(question);
     }
 
     public List<Quiz> findQuizzesByUserPrincipal(Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         return Optional.ofNullable(quizRepository.findByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found quizzes"));
-
     }
 
-    public double solveQuiz(Long quizId, List<AnswerToQuizQuestion> userAnswerToQuizQuestions, Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+    public double solveQuiz(Long quizId, List<AnswerToQuiz> userAnswerToQuizs, Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
         List<Question> questions = quiz.getQuestions();
-        if (userAnswerToQuizQuestions.size() != questions.size()) {
+        if (userAnswerToQuizs.size() != questions.size()) {
             throw new IllegalArgumentException("Number of answers user does not match with questions");
         }
         Result previousResult = resultRepository.findByUserIdAndQuizId(user.getId(), quizId);
@@ -245,8 +246,8 @@ public class QuizServiceImpl {
 
         for (int i = 0; i < questions.size(); i++) {
             Question question = questions.get(i);
-            AnswerToQuizQuestion userAnswerToQuizQuestion = userAnswerToQuizQuestions.get(i);
-            if (isCorrectAnswer(question, userAnswerToQuizQuestion)) {
+            AnswerToQuiz userAnswerToQuiz = userAnswerToQuizs.get(i);
+            if (isCorrectAnswer(question, userAnswerToQuiz)) {
                 correctAnswersCount++;
             }
         }
@@ -265,25 +266,25 @@ public class QuizServiceImpl {
         return score;
     }
 
-    private boolean isCorrectAnswer(Question question, AnswerToQuizQuestion userAnswerToQuizQuestion) {
-        AnswerToQuizQuestion correctAnswerToQuizQuestion = null;
-        for (AnswerToQuizQuestion answerToQuizQuestion : question.getAnswerToQuizQuestions()) {
-            if (answerToQuizQuestion.isCorrect()) {
-                correctAnswerToQuizQuestion = answerToQuizQuestion;
+    private boolean isCorrectAnswer(Question question, AnswerToQuiz userAnswerToQuiz) {
+        AnswerToQuiz correctAnswerToQuiz = null;
+        for (AnswerToQuiz answerToQuiz : question.getAnswerToQuiz()) {
+            if (answerToQuiz.isCorrect()) {
+                correctAnswerToQuiz = answerToQuiz;
                 break;
 
             }
         }
-        if (correctAnswerToQuizQuestion == null) {
+        if (correctAnswerToQuiz == null) {
             return false;
         }
-        return userAnswerToQuizQuestion.getAnswerNumber().equals(correctAnswerToQuizQuestion.getAnswerNumber());
+        return userAnswerToQuiz.getAnswerNumber().equals(correctAnswerToQuiz.getAnswerNumber());
 
     }
 
-    public List<QuizResultDTO> findQuizzesResults(Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+    public List<ResultDTO> findQuizzesResults(Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
         List<Result> results = resultRepository.findByUserId(user.getId());
         if (results.isEmpty()) {
@@ -291,7 +292,6 @@ public class QuizServiceImpl {
         }
 
         return mapEntity.mapQuizResultsToQuizResultsDTO(results);
-
     }
 
     @Transactional
@@ -308,8 +308,7 @@ public class QuizServiceImpl {
 
     @Transactional
     public void deleteQuizByIdForAdmin(Long id) {
-
-        Quiz quizToDelete = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz nor found"));
+        Quiz quizToDelete = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
         resultRepository.deleteByQuiz(quizToDelete);
 
