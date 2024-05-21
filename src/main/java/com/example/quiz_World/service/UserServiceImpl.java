@@ -18,7 +18,6 @@ public class UserServiceImpl {
     private final MapEntity mapEntity;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, MapEntity mapEntity) {
-
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapEntity = mapEntity;
@@ -42,11 +41,7 @@ public class UserServiceImpl {
         if (users.isEmpty()) {
             throw new EntityNotFoundException("List is empty");
         }
-        return
-                users.stream()
-                        .map(mapEntity::mapUserToUserDTO)
-                        .toList();
-
+        return mapEntity.mapUserListToUserDTOList(users);
     }
 }
 

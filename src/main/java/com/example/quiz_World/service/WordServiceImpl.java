@@ -34,18 +34,18 @@ public class WordServiceImpl {
         this.resultRepository = resultRepository;
     }
 
-    public WordSetDTO createWordSet(String title, Long categoryId, Status status, Principal principal) {
+    public WordSetDTO createWordSet(String title, WordSetCategory wordSetCategory, Status status, Principal principal) {
         String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Customer not found"));
-        WordSetCategory category = wordSetCategoryRepository.findById(categoryId).orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         WordSet wordSet = new WordSet();
         wordSet.setTitle(title);
         wordSet.setUserId(user.getId());
-        wordSet.setWordSetCategory(category);
+        wordSet.setWordSetCategory(wordSetCategory);
         wordSet.setStatus(status);
 
         wordSetRepository.save(wordSet);
+
         return mapEntity.mapWordSetToWordSetDTO(wordSet);
     }
 
@@ -54,14 +54,14 @@ public class WordServiceImpl {
 
         word.setWordSet(wordSet);
         word.setWordNumber(word.getWordNumber());
+        word.setWord(word.getWord());
         word.setTranslation(word.getTranslation());
         wordSet.getWords().add(word);
-
 
         wordSetRepository.save(wordSet);
     }
 
-    public List<WordSetDTO> findPublicWordSet() {
+    public List<WordSetDTO> findPublicWordSets() {
         List<WordSet> wordSetList = wordSetRepository.findByStatus(Status.PUBLIC);
         if (wordSetList.isEmpty()) {
             throw new EntityNotFoundException("List is empty");
@@ -88,6 +88,14 @@ public class WordServiceImpl {
         return mapEntity.mapWordSetListToWordSetListDTO(wordSetList);
     }
 
+    public WordSetDTO findWordSetById(Long wordSetId) {
+        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
+        if (wordSet.getStatus().equals(Status.PRIVATE)) {
+            throw new EntityNotFoundException("Word set not found");
+        }
+        return mapEntity.mapWordSetToWordSetDTO(wordSet);
+    }
+
     public List<WordDTO> findWordsByWordSetId(Long wordSetId) {
         WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
         if (wordSet.getStatus().equals(Status.PRIVATE)) {
@@ -101,10 +109,10 @@ public class WordServiceImpl {
     }
 
     @Transactional
-    public void deleteAllWordSetForUser(Principal principal) {
+    public void deleteAllWordSetsForUser(Principal principal) {
         List<WordSet> wordSets = findWordSetsByUserPrincipal(principal);
         if (wordSets.isEmpty()) {
-            throw new EntityNotFoundException("Not Found word sets");
+            throw new EntityNotFoundException("Not found word sets");
         }
         for (WordSet wordSet : wordSets) {
             resultRepository.deleteByWordSet(wordSet);
@@ -113,7 +121,7 @@ public class WordServiceImpl {
     }
 
     @Transactional
-    public void deleteWordSetById(Long wordSetId, Principal principal) {
+    public void deleteWordSetByIdForUser(Long wordSetId, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -139,16 +147,16 @@ public class WordServiceImpl {
         wordRepository.delete(word);
     }
 
-    public void updateWordSetByIdForUser(Long id, WordSet wordSet, Principal principal) {
+    public WordSet updateWordSetByIdForUser(Long id, WordSet wordSet, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        WordSet wordSetToUpdate = wordSetRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
+        WordSet wordSetToUpdate = wordSetRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
         if (!wordSetToUpdate.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized");
         }
         if (wordSet.getWordSetCategory() == null) {
-            throw new IllegalArgumentException("QuizCategory cannot be null");
+            throw new IllegalArgumentException("Word set category cannot be null");
         }
         WordSetCategory wordSetCategory = wordSetCategoryRepository.findById(wordSet.getWordSetCategory().getId()).orElseThrow(() -> new EntityNotFoundException("categoryQuiz not exists"));
 
@@ -156,10 +164,10 @@ public class WordServiceImpl {
         wordSetToUpdate.setWordSetCategory(wordSetCategory);
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
-        wordSetRepository.save(wordSetToUpdate);
+        return wordSetRepository.save(wordSetToUpdate);
     }
 
-    public void updateWordForUser(Long wordSetId, Long wordNumber, Word word, Principal principal) {
+    public Word updateWordForUser(Long wordSetId, Long wordNumber, Word word, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -171,8 +179,8 @@ public class WordServiceImpl {
 
         wordToUpdate.setWord(word.getWord());
         wordToUpdate.setTranslation(word.getTranslation());
-        wordRepository.save(wordToUpdate);
 
+        return wordRepository.save(wordToUpdate);
     }
 
     public double solveWordSet(Long wordSetId, List<AnswerToWordSet> userAnswers, Principal principal) {
@@ -201,43 +209,40 @@ public class WordServiceImpl {
         if (prviousResult != null && score > prviousResult.getScore()) {
             resultRepository.delete(prviousResult);
         }
-
         return score;
-
     }
 
     public List<WordSet> findWordSetsByUserPrincipal(Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        return Optional.ofNullable(wordSetRepository.findByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found word Sets"));
-
+        return Optional.ofNullable(wordSetRepository.findByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found word sets"));
     }
 
-    public void updateWordForAdmin(Long wordSetId, Long wordNumber, Word word) {
+    public Word updateWordForAdmin(Long wordSetId, Long wordNumber, Word word) {
         WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
 
         Word wordToUpdate = wordRepository.findByWordSetIdAndWordNumber(wordSet.getId(), wordNumber).orElseThrow(() -> new EntityNotFoundException("Not found word"));
 
         wordToUpdate.setWord(word.getWord());
         wordToUpdate.setTranslation(word.getTranslation());
-        wordRepository.save(wordToUpdate);
 
+        return wordRepository.save(wordToUpdate);
     }
 
-    public void updateWordSetByIdForAdmin(Long id, WordSet wordSet) {
+    public WordSet updateWordSetByIdForAdmin(Long id, WordSet wordSet) {
         WordSet wordSetToUpdate = wordSetRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
 
         if (wordSet.getWordSetCategory() == null) {
             throw new IllegalArgumentException("Word set category cannot be null");
         }
-        WordSetCategory wordSetCategory = wordSetCategoryRepository.findById(wordSet.getWordSetCategory().getId()).orElseThrow(() -> new EntityNotFoundException("categoryQuiz not exists"));
+        WordSetCategory wordSetCategory = wordSetCategoryRepository.findById(wordSet.getWordSetCategory().getId()).orElseThrow(() -> new EntityNotFoundException("category quiz not exists"));
 
         wordSetToUpdate.setTitle(wordSet.getTitle());
         wordSetToUpdate.setWordSetCategory(wordSetCategory);
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
-        wordSetRepository.save(wordSetToUpdate);
+        return wordSetRepository.save(wordSetToUpdate);
     }
 
     @Transactional
@@ -265,5 +270,4 @@ public class WordServiceImpl {
 
         wordRepository.delete(word);
     }
-
 }

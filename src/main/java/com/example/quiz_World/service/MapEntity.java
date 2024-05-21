@@ -2,10 +2,7 @@ package com.example.quiz_World.service;
 
 import com.example.quiz_World.entities.*;
 import com.example.quiz_World.entities.quizEntity.*;
-import com.example.quiz_World.entities.wordSetEntity.Word;
-import com.example.quiz_World.entities.wordSetEntity.WordDTO;
-import com.example.quiz_World.entities.wordSetEntity.WordSet;
-import com.example.quiz_World.entities.wordSetEntity.WordSetDTO;
+import com.example.quiz_World.entities.wordSetEntity.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,13 +19,12 @@ public class MapEntity {
         return quizDTO;
     }
 
-    List<QuizDTO> mapQuizzesToQuizzesDTO(List<Quiz> quizList) {
+    public List<QuizDTO> mapQuizzesToQuizzesDTO(List<Quiz> quizList) {
         List<QuizDTO> quizDTOS = new ArrayList<>();
 
         for (Quiz quiz : quizList) {
             QuizDTO quizDTO = mapQuizToQuizDTO(quiz);
             quizDTOS.add(quizDTO);
-
         }
         return quizDTOS;
     }
@@ -41,6 +37,40 @@ public class MapEntity {
             questionDTOList.add(questionDTO);
         }
         return questionDTOList;
+    }
+
+    public List<QuizCategoryDTO> mapQuizCategoriesToQuizCategoriesDTO(List<QuizCategory> quizCategoryList) {
+        List<QuizCategoryDTO> quizCategoryDTOS = new ArrayList<>();
+
+        for (QuizCategory quizCategory : quizCategoryList) {
+            QuizCategoryDTO quizCategoryDTO = mapQuizCategoryToQuizCategoryDTO(quizCategory);
+            quizCategoryDTOS.add(quizCategoryDTO);
+
+        }
+        return quizCategoryDTOS;
+    }
+
+    WordSetCategoryDTO mapWordSetCategoryToWordSSetCategoryDTO(WordSetCategory wordSetCategory) {
+        WordSetCategoryDTO wordSetCategoryDTO = new WordSetCategoryDTO();
+        wordSetCategoryDTO.setName(wordSetCategory.getName());
+        return wordSetCategoryDTO;
+    }
+
+    public List<WordSetCategoryDTO> mapWordSetCategoriesToWordSetCategoriesDTO(List<WordSetCategory> wordSetCategoryList) {
+        List<WordSetCategoryDTO> wordSetCategoryDTOS = new ArrayList<>();
+
+        for (WordSetCategory wordSetCategory : wordSetCategoryList) {
+            WordSetCategoryDTO wordSetCategoryDTO = mapWordSetCategoryToWordSSetCategoryDTO(wordSetCategory);
+            wordSetCategoryDTOS.add(wordSetCategoryDTO);
+
+        }
+        return wordSetCategoryDTOS;
+    }
+
+    QuizCategoryDTO mapQuizCategoryToQuizCategoryDTO(QuizCategory quizCategory) {
+        QuizCategoryDTO quizCategoryDTO = new QuizCategoryDTO();
+        quizCategoryDTO.setName(quizCategory.getName());
+        return quizCategoryDTO;
     }
 
     QuestionDTO mapQuestionToQuestionDTO(Question question) {
@@ -66,24 +96,44 @@ public class MapEntity {
         return answerToQuizDTOList;
     }
 
-    ResultDTO mapQuizResultToQuizResultDTO(Result result) {
-        ResultDTO resultDTO = new ResultDTO();
+    QuizResultDTO mapQuizResultToQuizResultDTO(Result result) {
+        QuizResultDTO quizResultDTO = new QuizResultDTO();
 
-        resultDTO.setUser(result.getUser().getName());
-        resultDTO.setQuiz(result.getQuiz().getTitle());
-        resultDTO.setScore(result.getScore());
+        quizResultDTO.setUser(result.getUser().getName());
+        quizResultDTO.setQuiz(result.getQuiz().getTitle());
+        quizResultDTO.setScore(result.getScore());
 
-        return resultDTO;
+        return quizResultDTO;
     }
 
-    List<ResultDTO> mapQuizResultsToQuizResultsDTO(List<Result> results) {
-        List<ResultDTO> resultDTOS = new ArrayList<>();
+    public List<QuizResultDTO> mapQuizResultsToQuizResultsDTO(List<Result> results) {
+        List<QuizResultDTO> quizResultDTOS = new ArrayList<>();
 
         for (Result result : results) {
-            ResultDTO resultDTO = mapQuizResultToQuizResultDTO(result);
-            resultDTOS.add(resultDTO);
+            QuizResultDTO quizResultDTO = mapQuizResultToQuizResultDTO(result);
+            quizResultDTOS.add(quizResultDTO);
         }
-        return resultDTOS;
+        return quizResultDTOS;
+    }
+
+    WordSetResultDTO mapWordSetResultToWordSetResultDTO(Result result) {
+        WordSetResultDTO wordSetResultDTO = new WordSetResultDTO();
+
+        wordSetResultDTO.setUser(result.getUser().getName());
+        wordSetResultDTO.setWordSet(result.getWordSet().getTitle());
+        wordSetResultDTO.setScore(result.getScore());
+
+        return wordSetResultDTO;
+    }
+
+    List<WordSetResultDTO> mapWordSetResultsToWordSetResultsDTO(List<Result> results) {
+        List<WordSetResultDTO> wordSetResultDTOS = new ArrayList<>();
+
+        for (Result result : results) {
+            WordSetResultDTO wordSetResultDTO = mapWordSetResultToWordSetResultDTO(result);
+            wordSetResultDTOS.add(wordSetResultDTO);
+        }
+        return wordSetResultDTOS;
     }
 
     UserDTO mapUserToUserDTO(User user) {
@@ -101,12 +151,12 @@ public class MapEntity {
         adminDTO.setId(admin.getId());
         adminDTO.setName(admin.getName());
         adminDTO.setEmail(admin.getEmail());
+
         return adminDTO;
     }
 
     WordSetDTO mapWordSetToWordSetDTO(WordSet wordSet) {
         WordSetDTO wordSetDTO = new WordSetDTO();
-        wordSetDTO.setId(wordSet.getId());
         wordSetDTO.setTitle(wordSet.getTitle());
         wordSetDTO.setCategory(wordSet.getWordSetCategory().getName());
 
@@ -127,7 +177,6 @@ public class MapEntity {
         wordDTO.setWordNumber(word.getWordNumber());
         wordDTO.setWord(word.getWord());
 
-
         return wordDTO;
     }
 
@@ -138,5 +187,14 @@ public class MapEntity {
             wordDTOList.add(wordDTO);
         }
         return wordDTOList;
+    }
+
+    List<UserDTO> mapUserListToUserDTOList(List<User> userList) {
+        List<UserDTO> userDTOList = new ArrayList<>();
+        for (User user : userList) {
+            UserDTO userDTO = mapUserToUserDTO(user);
+            userDTOList.add(userDTO);
+        }
+        return userDTOList;
     }
 }
