@@ -6,5 +6,4 @@ import lombok.Data;
 public class WordDTO {
     private Long wordNumber;
     private String word;
-
 }

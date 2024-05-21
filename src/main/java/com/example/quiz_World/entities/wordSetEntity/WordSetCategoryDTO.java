@@ -3,7 +3,6 @@ package com.example.quiz_World.entities.wordSetEntity;
 import lombok.Data;
 
 @Data
-public class WordSetDTO {
-    private String title;
-    private String category;
+public class WordSetCategoryDTO {
+    String name;
 }

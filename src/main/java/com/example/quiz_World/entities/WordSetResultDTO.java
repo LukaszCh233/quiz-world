@@ -3,8 +3,8 @@ package com.example.quiz_World.entities;
 import lombok.Data;
 
 @Data
-public class ResultDTO {
+public class WordSetResultDTO {
     private String user;
-    private String quiz;
+    private String wordSet;
     private Double score;
 }
