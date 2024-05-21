@@ -30,6 +30,5 @@ public class AdminServiceImpl {
         admin.setPassword(encodedPassword);
         Admin createAdmin = adminRepository.save(admin);
         return mapEntity.mapAdminToAdminDTO(createAdmin);
-
     }
 }

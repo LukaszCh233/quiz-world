@@ -17,9 +17,7 @@ import java.util.function.Function;
 
 @Service
 public class HelpJwt {
-
     private static final long jwtExpiration = 360000000L;
-
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

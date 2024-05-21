@@ -14,7 +14,6 @@ import java.util.Date;
 public class JwtTokenServiceImpl {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenServiceImpl.class);
 
-
     private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     long TOKEN_EXPIRATION_TIME = 3600000;
 

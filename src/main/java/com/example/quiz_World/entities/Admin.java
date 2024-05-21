@@ -32,7 +32,6 @@ public class Admin implements UserDetails {
 
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
 
-
         return authorities;
     }
 

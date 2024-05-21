@@ -22,13 +22,10 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
     @Column(unique = true)
     private String email;
-
     private String password;
-
     private Role role;
 
     @Override
@@ -36,7 +33,6 @@ public class User implements UserDetails {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
         authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
-
 
         return authorities;
     }

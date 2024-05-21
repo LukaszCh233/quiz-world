@@ -15,17 +15,14 @@ public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
     @ManyToOne
     @JoinColumn(name = "wordSet_id")
     private WordSet wordSet;
-
     private Double score;
 }

@@ -14,6 +14,4 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     List<Quiz> findByStatus(Status status);
 
     List<Quiz> findByQuizCategoryId(Long id);
-
-
 }
