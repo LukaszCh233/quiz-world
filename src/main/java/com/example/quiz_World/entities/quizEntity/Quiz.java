@@ -19,11 +19,9 @@ public class Quiz {
     private Long id;
     private Long userId;
     private String title;
-
     @ManyToOne
     private QuizCategory quizCategory;
-
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Question> questions;
     private Status status;
 }

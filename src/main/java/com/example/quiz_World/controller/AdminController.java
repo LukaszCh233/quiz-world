@@ -25,8 +25,8 @@ public class AdminController {
     private final CategoryServiceImp categoryService;
     private final WordServiceImpl wordService;
 
-
-    public AdminController(UserServiceImpl userService, QuizServiceImpl quizService, CategoryServiceImp categoryService, WordServiceImpl wordService) {
+    public AdminController(UserServiceImpl userService, QuizServiceImpl quizService, CategoryServiceImp categoryService,
+                           WordServiceImpl wordService) {
         this.userService = userService;
         this.quizService = quizService;
         this.categoryService = categoryService;
@@ -82,13 +82,13 @@ public class AdminController {
     @DeleteMapping("/deleteQuestion/{quizId}/{questionNumber}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber) {
         quizService.deleteQuestionByNumberQuestionForAdmin(quizId, questionNumber);
-        return ResponseEntity.ok("Question deleted");
+        return ResponseEntity.ok("Question has been deleted");
     }
 
     @DeleteMapping("/deleteQuizCategory/{categoryId}")
     public ResponseEntity<?> deleteQuizCategory(@PathVariable Long categoryId) {
         categoryService.deleteQuizCategoryById(categoryId);
-        return ResponseEntity.ok("Category has ben deleted");
+        return ResponseEntity.ok("Category has been deleted");
     }
 
     @DeleteMapping("/deleteAllQuizCategories")
@@ -112,19 +112,19 @@ public class AdminController {
     @DeleteMapping("/deleteWordSets")
     public ResponseEntity<?> deleteAllWordSets() {
         wordService.deleteAllWordSetsForAdmin();
-        return ResponseEntity.ok("All word sets have been deleted");
+        return ResponseEntity.ok("All word sets has been deleted");
     }
 
     @DeleteMapping("/deleteWordSet/{wordSetId}")
     public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId) {
         wordService.deleteWordSetByIdForAdmin(wordSetId);
-        return ResponseEntity.ok("Word set have been deleted");
+        return ResponseEntity.ok("Word set has been deleted");
     }
 
     @DeleteMapping("/deleteWord/{wordSetId}/{wordNumber}")
     public ResponseEntity<?> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber) {
         wordService.deleteWordByNumberWordSetForAdmin(wordSetId, wordNumber);
-        return ResponseEntity.ok("Word deleted");
+        return ResponseEntity.ok("Word has been deleted");
     }
 
     @DeleteMapping("/deleteWordSetCategory/{categoryId}")
@@ -137,5 +137,17 @@ public class AdminController {
     public ResponseEntity<?> deleteAllWordSetCategories() {
         categoryService.deleteAllWordSetCategories();
         return ResponseEntity.ok("All Categories has been deleted");
+    }
+
+    @PutMapping("/updateWordSetCategory/{categoryId}")
+    public ResponseEntity<?> updateWordSetCategory(@PathVariable Long categoryId, @RequestBody WordSetCategory wordSetCategory) {
+        WordSetCategory updateCategory = categoryService.updateWordSetCategory(categoryId, wordSetCategory);
+        return ResponseEntity.ok(updateCategory);
+    }
+
+    @PutMapping("/updateQuizCategory/{categoryId}")
+    public ResponseEntity<?> updateQuizCategory(@PathVariable Long categoryId, @RequestBody QuizCategory quizCategory) {
+        QuizCategory updateCategory = categoryService.updateQuizCategory(categoryId, quizCategory);
+        return ResponseEntity.ok(updateCategory);
     }
 }

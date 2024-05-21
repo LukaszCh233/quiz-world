@@ -1,9 +1,9 @@
 package com.example.quiz_World.controller;
 
-import com.example.quiz_World.entities.ResultDTO;
-import com.example.quiz_World.entities.quizEntity.AnswerToQuiz;
+import com.example.quiz_World.entities.QuizResultDTO;
 import com.example.quiz_World.entities.quizEntity.Question;
 import com.example.quiz_World.entities.quizEntity.Quiz;
+import com.example.quiz_World.entities.quizEntity.UserAnswer;
 import com.example.quiz_World.entities.wordSetEntity.AnswerToWordSet;
 import com.example.quiz_World.entities.wordSetEntity.Word;
 import com.example.quiz_World.entities.wordSetEntity.WordSet;
@@ -23,7 +23,6 @@ public class UserController {
     private final QuizServiceImpl quizService;
     private final WordServiceImpl wordService;
 
-
     public UserController(QuizServiceImpl quizService, WordServiceImpl wordService) {
         this.quizService = quizService;
         this.wordService = wordService;
@@ -33,21 +32,21 @@ public class UserController {
     public ResponseEntity<?> deleteYourQuizzes(Principal principal) {
         quizService.deleteAllQuizzesForUser(principal);
 
-        return ResponseEntity.ok("All Quizzes have been deleted");
+        return ResponseEntity.ok("All quizzes has been deleted");
     }
 
     @DeleteMapping("/deleteQuestion/{quizId}/{questionNumber}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, Principal principal) {
         quizService.deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
 
-        return ResponseEntity.ok("Question deleted");
+        return ResponseEntity.ok("Question has been deleted");
     }
 
     @DeleteMapping("/deleteQuiz/{quizId}")
     public ResponseEntity<?> deleteYourQuiz(@PathVariable Long quizId, Principal principal) {
         quizService.deleteQuizByIdForUser(quizId, principal);
 
-        return ResponseEntity.ok("Quiz deleted");
+        return ResponseEntity.ok("Quiz has been deleted");
     }
 
     @PutMapping("/updateQuiz/{quizId}")
@@ -65,17 +64,17 @@ public class UserController {
     }
 
     @PostMapping("/solveQuiz/{quizId}")
-    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<AnswerToQuiz> userAnswerToQuizs, Principal principal) {
+    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswerToQuizs, Principal principal) {
         double score = quizService.solveQuiz(quizId, userAnswerToQuizs, principal);
 
         return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
     }
 
     @GetMapping("/score")
-    public ResponseEntity<List<ResultDTO>> displayQuizzesScore(Principal principal) {
-        List<ResultDTO> resultDTOS = quizService.findQuizzesResults(principal);
+    public ResponseEntity<List<QuizResultDTO>> displayQuizzesScore(Principal principal) {
+        List<QuizResultDTO> quizResultDTOS = quizService.findQuizzesResults(principal);
 
-        return ResponseEntity.ok(resultDTOS);
+        return ResponseEntity.ok(quizResultDTOS);
     }
 
     @PostMapping("/solveWordSet/{wordSetId}")
@@ -88,14 +87,14 @@ public class UserController {
     @Transactional
     @DeleteMapping("/deleteWordSets")
     public ResponseEntity<?> deleteAllWordSet(Principal principal) {
-        wordService.deleteAllWordSetForUser(principal);
+        wordService.deleteAllWordSetsForUser(principal);
 
-        return ResponseEntity.ok("Word sets has been deleted");
+        return ResponseEntity.ok("All word sets has been deleted");
     }
 
     @DeleteMapping("/deleteWordSet/{wordSetId}")
     public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId, Principal principal) {
-        wordService.deleteWordSetById(wordSetId, principal);
+        wordService.deleteWordSetByIdForUser(wordSetId, principal);
 
         return ResponseEntity.ok("Word set has been deleted");
     }
@@ -104,7 +103,7 @@ public class UserController {
     public ResponseEntity<?> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, Principal principal) {
         wordService.deleteWordByNumberWordSetForUser(wordSetId, wordNumber, principal);
 
-        return ResponseEntity.ok("Word deleted");
+        return ResponseEntity.ok("Word has been deleted");
     }
 
     @PutMapping("/updateWordSet/{wordSetId}")

@@ -48,15 +48,14 @@ public class CommonController {
 
     @PostMapping("/createQuiz")
     public ResponseEntity<QuizDTO> createQuiz(@RequestBody Quiz quiz, Principal principal) {
-
         QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory(), quiz.getStatus(), principal);
 
         return ResponseEntity.ok(createQuiz);
     }
 
     @PostMapping("/addQuestionsToQuiz/{quizId}")
-    public ResponseEntity<?> addQuestionsToQuiz(@PathVariable Long quizId, @RequestBody Question questions) {
-        quizService.addQuestionsToQuiz(quizId, questions);
+    public ResponseEntity<?> addQuestionsToQuiz(@PathVariable Long quizId, @RequestBody Question question) {
+        quizService.addQuestionsToQuiz(quizId, question);
 
         return ResponseEntity.ok("Question added to quiz successfully");
     }
@@ -68,37 +67,37 @@ public class CommonController {
         return ResponseEntity.ok(quizzes);
     }
 
-    @GetMapping("/Quizzes/{categoryId}")
+    @GetMapping("/quizzes/{categoryId}")
     public ResponseEntity<List<QuizDTO>> displayQuizzesByCategory(@PathVariable Long categoryId) {
-        List<QuizDTO> quizDTOList = quizService.findQuizByCategoryId(categoryId);
+        List<QuizDTO> quizDTOList = quizService.findQuizByCategory(categoryId);
 
         return ResponseEntity.ok(quizDTOList);
     }
 
     @GetMapping("/quizCategories")
-    public ResponseEntity<List<QuizCategory>> displayQuizCategories() {
-        List<QuizCategory> quizCategoryList = categoryService.findAllQuizCategories();
+    public ResponseEntity<List<QuizCategoryDTO>> displayQuizCategories() {
+        List<QuizCategoryDTO> quizCategoryDTOList = categoryService.findAllQuizCategories();
 
-        return ResponseEntity.ok(quizCategoryList);
+        return ResponseEntity.ok(quizCategoryDTOList);
     }
 
     @GetMapping("/wordSetCategories")
-    public ResponseEntity<List<WordSetCategory>> displayWordSetCategories() {
-        List<WordSetCategory> wordSetCategoryList = categoryService.findAllWordSetCategories();
+    public ResponseEntity<List<WordSetCategoryDTO>> displayWordSetCategories() {
+        List<WordSetCategoryDTO> wordSetCategoryDTOList = categoryService.findAllWordSetCategories();
 
-        return ResponseEntity.ok(wordSetCategoryList);
+        return ResponseEntity.ok(wordSetCategoryDTOList);
     }
 
     @GetMapping("/wordSets")
     public ResponseEntity<?> displayWordSets() {
-        List<WordSetDTO> wordSetDTOList = wordService.findPublicWordSet();
+        List<WordSetDTO> wordSetDTOList = wordService.findPublicWordSets();
 
         return ResponseEntity.ok(wordSetDTOList);
     }
 
     @PostMapping("/createWordSet")
     public ResponseEntity<?> createWordSet(@RequestBody WordSet wordSet, Principal principal) {
-        WordSetDTO createWordSet = wordService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory().getId(), wordSet.getStatus(), principal);
+        WordSetDTO createWordSet = wordService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory(), wordSet.getStatus(), principal);
 
         return ResponseEntity.ok(createWordSet);
     }
@@ -110,7 +109,7 @@ public class CommonController {
         return ResponseEntity.ok("Word added to word set successfully");
     }
 
-    @GetMapping("/yourWordsSets")
+    @GetMapping("/yourWordSets")
     public ResponseEntity<List<WordSetDTO>> displayYourWordSets(Principal principal) {
         List<WordSetDTO> wordSetDTOS = wordService.findYourWordSets(principal);
 
@@ -129,5 +128,12 @@ public class CommonController {
         List<WordDTO> words = wordService.findWordsByWordSetId(wordSetId);
 
         return ResponseEntity.ok(words);
+    }
+
+    @GetMapping("/wordSet/{id}")
+    public ResponseEntity<?> displayWordSet(@PathVariable Long id) {
+        WordSetDTO wordSetDTO = wordService.findWordSetById(id);
+
+        return ResponseEntity.ok(wordSetDTO);
     }
 }
