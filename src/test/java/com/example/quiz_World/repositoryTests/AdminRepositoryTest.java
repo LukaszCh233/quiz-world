@@ -3,7 +3,6 @@ package com.example.quiz_World.repositoryTests;
 import com.example.quiz_World.entities.Admin;
 import com.example.quiz_World.entities.Role;
 import com.example.quiz_World.repository.AdminRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("quizWorldTest")
@@ -40,7 +38,9 @@ public class AdminRepositoryTest {
 
         assertFalse(adminList.isEmpty());
         assertEquals(1, adminList.size());
-
+        assertEquals(adminList.get(0).getId(), admin.getId());
+        assertEquals(adminList.get(0).getName(), admin.getName());
+        assertEquals(adminList.get(0).getEmail(), admin.getEmail());
     }
 
     @Test
@@ -53,8 +53,8 @@ public class AdminRepositoryTest {
         Optional<Admin> findAdmin = adminRepository.findByEmail(admin.getEmail());
 
         //Then
-        Assertions.assertTrue(findAdmin.isPresent());
+        assertTrue(findAdmin.isPresent());
         String foundEmail = findAdmin.get().getEmail();
-        Assertions.assertEquals(foundEmail, admin.getEmail());
+        assertEquals(foundEmail, admin.getEmail());
     }
 }

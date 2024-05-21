@@ -42,6 +42,9 @@ public class UserRepositoryTest {
 
         assertFalse(userList.isEmpty());
         assertEquals(1, userList.size());
+        assertEquals(userList.get(0).getId(), user.getId());
+        assertEquals(userList.get(0).getName(), user.getName());
+        assertEquals(userList.get(0).getEmail(), user.getEmail());
     }
 
     @Test

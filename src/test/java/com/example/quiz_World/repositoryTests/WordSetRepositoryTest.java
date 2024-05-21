@@ -1,12 +1,9 @@
 package com.example.quiz_World.repositoryTests;
 
-import com.example.quiz_World.entities.Role;
 import com.example.quiz_World.entities.Status;
-import com.example.quiz_World.entities.User;
 import com.example.quiz_World.entities.wordSetEntity.WordSet;
 import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
 import com.example.quiz_World.repository.ResultRepository;
-import com.example.quiz_World.repository.UserRepository;
 import com.example.quiz_World.repository.WordSetCategoryRepository;
 import com.example.quiz_World.repository.WordSetRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +23,6 @@ public class WordSetRepositoryTest {
     @Autowired
     WordSetRepository wordSetRepository;
     @Autowired
-    UserRepository userRepository;
-    @Autowired
     ResultRepository resultRepository;
     @Autowired
     WordSetCategoryRepository wordSetCategoryRepository;
@@ -41,7 +36,7 @@ public class WordSetRepositoryTest {
     @Test
     void shouldSaveWordSet_Test() {
         //Given
-        WordSet wordSet = new WordSet(null, "test", null, null, null, null);
+        WordSet wordSet = new WordSet();
 
         //When
         wordSetRepository.save(wordSet);
@@ -73,7 +68,7 @@ public class WordSetRepositoryTest {
     @Test
     void shouldFindWordSetByStatus_Test() {
         //Given
-        WordSet wordSet = new WordSet(null, null, null, null, null, Status.PUBLIC);
+        WordSet wordSet = new WordSet();
         wordSetRepository.save(wordSet);
 
         //When
@@ -82,19 +77,18 @@ public class WordSetRepositoryTest {
         //Then
         assertFalse(wordSetList.isEmpty());
         assertEquals(1, wordSetList.size());
-
     }
 
     @Test
     void shouldFindWordSetByUserId_Test() {
         //Given
-        User user = new User(null, "testName", "testEmail", "testPassword", Role.USER);
+        Long userId = 1L;
 
-        WordSet wordSet = new WordSet(null, null, null, user.getId(), null, Status.PUBLIC);
+        WordSet wordSet = new WordSet(null, null, null, userId, null, Status.PUBLIC);
         wordSetRepository.save(wordSet);
 
         //When
-        List<WordSet> wordSetList = wordSetRepository.findByUserId(user.getId());
+        List<WordSet> wordSetList = wordSetRepository.findByUserId(userId);
 
         //Then
         assertFalse(wordSetList.isEmpty());
@@ -133,13 +127,12 @@ public class WordSetRepositoryTest {
         //Then
         List<WordSet> wordSetList = wordSetRepository.findAll();
         assertTrue(wordSetList.isEmpty());
-
     }
 
     @Test
     void shouldDeleteWordSet_Test() {
         //Given
-        WordSet wordSet = new WordSet(null, null, null, null, null, Status.PUBLIC);
+        WordSet wordSet = new WordSet();
         wordSetRepository.save(wordSet);
 
         //When
@@ -163,6 +156,5 @@ public class WordSetRepositoryTest {
         //Then
         assertFalse(wordSetList.isEmpty());
         assertEquals(2, wordSetList.size());
-
     }
 }

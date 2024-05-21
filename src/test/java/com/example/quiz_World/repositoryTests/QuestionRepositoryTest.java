@@ -24,8 +24,9 @@ public class QuestionRepositoryTest {
     QuizRepository quizRepository;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         questionRepository.deleteAll();
+        quizRepository.deleteAll();
     }
 
     @Test
@@ -41,13 +42,15 @@ public class QuestionRepositoryTest {
 
         assertEquals(1, questionList.size());
         assertFalse(questionList.isEmpty());
+        assertEquals(questionList.get(0).getId(), question.getId());
+        assertEquals(questionList.get(0).getContent(), question.getContent());
+        assertEquals(questionList.get(0).getQuestionNumber(), question.getQuestionNumber());
     }
 
     @Test
     void shouldDeleteQuestion_Test() {
         //Given
         Question question = new Question(null, 1L, "test", null, null);
-
         questionRepository.save(question);
 
         //When
@@ -61,13 +64,11 @@ public class QuestionRepositoryTest {
 
     @Test
     void shouldFindQuestionByQuizIdAndQuestionNumber_Test() {
+        //Given
         Quiz quiz = new Quiz(null, null, null, null, null, null);
-
         quizRepository.save(quiz);
 
-        //Given
         Question question = new Question(null, 1L, "test", quiz, null);
-
         questionRepository.save(question);
 
         //When
@@ -79,6 +80,5 @@ public class QuestionRepositoryTest {
         assertEquals(findQuestion.getQuestionNumber(), question.getQuestionNumber());
         assertEquals(findQuestion.getContent(), question.getContent());
         assertEquals(findQuestion.getId(), question.getId());
-
     }
 }

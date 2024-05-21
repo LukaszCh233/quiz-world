@@ -37,6 +37,8 @@ public class WordSetCategoryRepositoryTest {
 
         assertFalse(wordSetCategoryList.isEmpty());
         assertEquals(1, wordSetCategoryList.size());
+        assertEquals(wordSetCategoryList.get(0).getId(), wordSetCategory.getId());
+        assertEquals(wordSetCategoryList.get(0).getName(), wordSetCategory.getName());
     }
 
     @Test
@@ -44,7 +46,6 @@ public class WordSetCategoryRepositoryTest {
         //Given
         WordSetCategory wordSetCategory = new WordSetCategory(null, "testCategory");
         WordSetCategory wordSetCategory1 = new WordSetCategory(null, "testCategory1");
-
         wordSetCategoryRepository.save(wordSetCategory);
         wordSetCategoryRepository.save(wordSetCategory1);
 
@@ -61,7 +62,6 @@ public class WordSetCategoryRepositoryTest {
     void shouldFindWordSetCategoryById_Test() {
         //Given
         WordSetCategory wordSetCategory = new WordSetCategory(null, "test");
-
         wordSetCategoryRepository.save(wordSetCategory);
 
         //When
@@ -76,7 +76,6 @@ public class WordSetCategoryRepositoryTest {
     void shouldDeleteWordSetCategory_Test() {
         //Given
         WordSetCategory wordSetCategory = new WordSetCategory(null, "test");
-
         wordSetCategoryRepository.save(wordSetCategory);
 
         //When

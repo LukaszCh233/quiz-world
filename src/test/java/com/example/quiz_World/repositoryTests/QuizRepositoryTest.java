@@ -1,8 +1,6 @@
 package com.example.quiz_World.repositoryTests;
 
-import com.example.quiz_World.entities.Role;
 import com.example.quiz_World.entities.Status;
-import com.example.quiz_World.entities.User;
 import com.example.quiz_World.entities.quizEntity.Quiz;
 import com.example.quiz_World.entities.quizEntity.QuizCategory;
 import com.example.quiz_World.repository.QuizCategoryRepository;
@@ -28,7 +26,6 @@ public class QuizRepositoryTest {
 
     @BeforeEach
     void setUp() {
-
         quizRepository.deleteAll();
     }
 
@@ -36,7 +33,6 @@ public class QuizRepositoryTest {
     void shouldSaveQuiz_Test() {
         //Given
         Quiz quiz = new Quiz(null, null, "testTitle", new QuizCategory(null, "test"), null, Status.PUBLIC);
-
         quizCategoryRepository.save(quiz.getQuizCategory());
 
         //When
@@ -57,7 +53,6 @@ public class QuizRepositoryTest {
     void shouldFindQuizById_Test() {
         //Given
         Quiz quiz = new Quiz(null, null, "testTitle", new QuizCategory(null, "test"), null, Status.PUBLIC);
-
         quizCategoryRepository.save(quiz.getQuizCategory());
         quizRepository.save(quiz);
 
@@ -78,7 +73,6 @@ public class QuizRepositoryTest {
         //Given
         Quiz quiz = new Quiz(null, null, "testTitle", null, null, Status.PUBLIC);
         Quiz quiz1 = new Quiz(null, null, "testTitle1", null, null, Status.PRIVATE);
-
         quizRepository.save(quiz);
         quizRepository.save(quiz1);
 
@@ -98,7 +92,6 @@ public class QuizRepositoryTest {
     void shouldDeleteQuiz_Test() {
         //Given
         Quiz quiz = new Quiz(null, null, "testTitle", null, null, Status.PUBLIC);
-
         quizRepository.save(quiz);
 
         //When
@@ -115,7 +108,6 @@ public class QuizRepositoryTest {
         //Given
         Quiz quiz = new Quiz(null, null, "testTitle", null, null, Status.PUBLIC);
         Quiz quiz1 = new Quiz(null, null, "testTitle1", null, null, Status.PRIVATE);
-
         quizRepository.save(quiz);
         quizRepository.save(quiz1);
 
@@ -132,7 +124,6 @@ public class QuizRepositoryTest {
         //Given
         Quiz quiz = new Quiz(null, null, "testTitle", null, null, Status.PUBLIC);
         Quiz quiz1 = new Quiz(null, null, "testTitle1", null, null, Status.PRIVATE);
-
         quizRepository.save(quiz);
         quizRepository.save(quiz1);
 
@@ -150,9 +141,9 @@ public class QuizRepositoryTest {
         //Given
         QuizCategory quizCategory = new QuizCategory(null, "test");
         quizCategoryRepository.save(quizCategory);
+
         Quiz quiz = new Quiz(null, null, "testTitle", quizCategory, null, Status.PUBLIC);
         Quiz quiz1 = new Quiz(null, null, "testTitle", quizCategory, null, Status.PUBLIC);
-
         quizRepository.save(quiz);
         quizRepository.save(quiz1);
 
@@ -162,24 +153,35 @@ public class QuizRepositoryTest {
         //Then
         assertEquals(2, quizList.size());
         assertFalse(quizList.isEmpty());
+        assertEquals(quizList.get(0).getId(),quiz.getId());
+        assertEquals(quizList.get(0).getTitle(),quiz.getTitle());
+        assertEquals(quizList.get(0).getQuizCategory(),quiz.getQuizCategory());
+        assertEquals(quizList.get(1).getId(),quiz1.getId());
+        assertEquals(quizList.get(1).getTitle(),quiz1.getTitle());
+        assertEquals(quizList.get(1).getQuizCategory(),quiz1.getQuizCategory());
     }
 
     @Test
     void shouldFindQuizByUserId_Test() {
         //Given
-        User user = new User(null, "testName", "testEmail", "testPassword", Role.USER);
+        Long userId = 1L;
 
-        Quiz quiz = new Quiz(null, user.getId(), "testTitle", null, null, Status.PUBLIC);
-        Quiz quiz1 = new Quiz(null, user.getId(), "testTitle", null, null, Status.PUBLIC);
-
+        Quiz quiz = new Quiz(null, userId, "testTitle", null, null, Status.PUBLIC);
+        Quiz quiz1 = new Quiz(null, userId, "testTitle1", null, null, Status.PUBLIC);
         quizRepository.save(quiz);
         quizRepository.save(quiz1);
 
         //When
-        List<Quiz> quizList = quizRepository.findByUserId(user.getId());
+        List<Quiz> quizList = quizRepository.findByUserId(userId);
 
         //Then
         assertFalse(quizList.isEmpty());
         assertEquals(2, quizList.size());
+        assertEquals(quizList.get(0).getId(), quiz.getId());
+        assertEquals(quizList.get(0).getUserId(), quiz.getUserId());
+        assertEquals(quizList.get(0).getTitle(), quiz.getTitle());
+        assertEquals(quizList.get(1).getId(), quiz1.getId());
+        assertEquals(quizList.get(1).getUserId(), quiz1.getUserId());
+        assertEquals(quizList.get(1).getTitle(), quiz1.getTitle());
     }
 }

@@ -56,11 +56,10 @@ public class ResultRepositoryTest {
     @Test
     void shouldDeleteResultByQuiz_Test() {
         //Given
-        Quiz quiz = new Quiz(null, null, null, null, null, null);
+        Quiz quiz = new Quiz();
         quizRepository.save(quiz);
 
         Result result = new Result(null, null, quiz, null, 100.0);
-
         resultRepository.save(result);
 
         //When
@@ -76,7 +75,7 @@ public class ResultRepositoryTest {
     @Test
     void shouldDeleteResultByWordSet_Test() {
         //Given
-        WordSet wordSet = new WordSet(null, null, null, null, null, null);
+        WordSet wordSet = new WordSet();
         wordSetRepository.save(wordSet);
 
         Result result = new Result(null, null, null, wordSet, 100.0);
@@ -92,12 +91,12 @@ public class ResultRepositoryTest {
     }
 
     @Test
-    void shouldFindByUserIdAndQuizId_Test() {
+    void shouldFindResultByUserIdAndQuizId_Test() {
         //Given
-        User user = new User(null, null, null, null, null);
+        User user = new User();
         userRepository.save(user);
 
-        Quiz quiz = new Quiz(null, user.getId(), null, null, null, null);
+        Quiz quiz = new Quiz();
         quizRepository.save(quiz);
 
         Result result = new Result(null, user, quiz, null, 100.0);
@@ -113,12 +112,12 @@ public class ResultRepositoryTest {
     }
 
     @Test
-    void shouldFindByUserIdAndWordSet_Test() {
+    void shouldFindResultByUserIdAndWordSet_Test() {
         //Given
-        User user = new User(null, null, null, null, null);
+        User user = new User();
         userRepository.save(user);
 
-        WordSet wordSet = new WordSet(null, null, null, user.getId(), null, null);
+        WordSet wordSet = new WordSet();
         wordSetRepository.save(wordSet);
 
         Result result = new Result(null, user, null, wordSet, 100.0);
@@ -134,9 +133,9 @@ public class ResultRepositoryTest {
     }
 
     @Test
-    void shouldFindByUserId_Test() {
+    void shouldFindResultByUserId_Test() {
         //Given
-        User user = new User(null, null, null, null, null);
+        User user = new User();
         userRepository.save(user);
 
         Result result = new Result(null, user, null, null, 100.0);
