@@ -1,6 +1,7 @@
 package com.example.quiz_World.controller;
 
 import com.example.quiz_World.entities.QuizResultDTO;
+import com.example.quiz_World.entities.WordSetResultDTO;
 import com.example.quiz_World.entities.quizEntity.Question;
 import com.example.quiz_World.entities.quizEntity.Quiz;
 import com.example.quiz_World.entities.quizEntity.UserAnswer;
@@ -64,17 +65,29 @@ public class UserController {
     }
 
     @PostMapping("/solveQuiz/{quizId}")
-    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswerToQuizs, Principal principal) {
-        double score = quizService.solveQuiz(quizId, userAnswerToQuizs, principal);
+    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
+        double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
 
         return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
     }
 
-    @GetMapping("/score")
-    public ResponseEntity<List<QuizResultDTO>> displayQuizzesScore(Principal principal) {
-        List<QuizResultDTO> quizResultDTOS = quizService.findQuizzesResults(principal);
+    @GetMapping("/quiz/score")
+    public ResponseEntity<List<QuizResultDTO>> displayYourQuizzesScore(Principal principal) {
+        List<QuizResultDTO> quizResultDTOS = quizService.findYourQuizzesResults(principal);
 
         return ResponseEntity.ok(quizResultDTOS);
+    }
+    @GetMapping("/quiz/globalScore")
+    public ResponseEntity<List<QuizResultDTO>> displayQuizzesScore() {
+        List<QuizResultDTO> quizResultDTOS = quizService.findQuizzesResults();
+
+        return ResponseEntity.ok(quizResultDTOS);
+    }
+    @GetMapping("/words/score")
+    public ResponseEntity<List<WordSetResultDTO>> displayYourWordSetsScore(Principal principal) {
+        List<WordSetResultDTO> wordSetResultDTOS = wordService.findYourWordsResults(principal);
+
+        return ResponseEntity.ok(wordSetResultDTOS);
     }
 
     @PostMapping("/solveWordSet/{wordSetId}")

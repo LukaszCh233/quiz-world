@@ -48,7 +48,7 @@ public class CommonController {
 
     @PostMapping("/createQuiz")
     public ResponseEntity<QuizDTO> createQuiz(@RequestBody Quiz quiz, Principal principal) {
-        QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory(), quiz.getStatus(), principal);
+        QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory().getId(), quiz.getStatus(), principal);
 
         return ResponseEntity.ok(createQuiz);
     }
@@ -96,8 +96,8 @@ public class CommonController {
     }
 
     @PostMapping("/createWordSet")
-    public ResponseEntity<?> createWordSet(@RequestBody WordSet wordSet, Principal principal) {
-        WordSetDTO createWordSet = wordService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory(), wordSet.getStatus(), principal);
+    public ResponseEntity<WordSetDTO> createWordSet(@RequestBody WordSet wordSet, Principal principal) {
+        WordSetDTO createWordSet = wordService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory().getId(), wordSet.getStatus(), principal);
 
         return ResponseEntity.ok(createWordSet);
     }

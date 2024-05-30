@@ -7,4 +7,5 @@ public class QuizResultDTO {
     private String user;
     private String quiz;
     private Double score;
+
 }

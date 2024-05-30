@@ -12,7 +12,7 @@ import java.util.List;
 public class MapEntity {
     QuizDTO mapQuizToQuizDTO(Quiz quiz) {
         QuizDTO quizDTO = new QuizDTO();
-
+        quizDTO.setId(quiz.getId());
         quizDTO.setTitle(quiz.getTitle());
         quizDTO.setCategory(quiz.getQuizCategory().getName());
 
@@ -156,7 +156,9 @@ public class MapEntity {
     }
 
     WordSetDTO mapWordSetToWordSetDTO(WordSet wordSet) {
+
         WordSetDTO wordSetDTO = new WordSetDTO();
+        wordSetDTO.setId(wordSet.getId());
         wordSetDTO.setTitle(wordSet.getTitle());
         wordSetDTO.setCategory(wordSet.getWordSetCategory().getName());
 

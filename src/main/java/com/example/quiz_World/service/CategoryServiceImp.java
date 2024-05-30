@@ -4,6 +4,7 @@ import com.example.quiz_World.entities.quizEntity.QuizCategory;
 import com.example.quiz_World.entities.quizEntity.QuizCategoryDTO;
 import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
 import com.example.quiz_World.entities.wordSetEntity.WordSetCategoryDTO;
+import com.example.quiz_World.exceptions.ExistsException;
 import com.example.quiz_World.repository.QuizCategoryRepository;
 import com.example.quiz_World.repository.WordSetCategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImp {
@@ -26,6 +28,10 @@ public class CategoryServiceImp {
     }
 
     public QuizCategory createQuizCategory(QuizCategory quizCategory) {
+        Optional<QuizCategory> existingCategory = quizCategoryRepository.findByNameIgnoreCase(quizCategory.getName());
+        if (existingCategory.isPresent()) {
+            throw new ExistsException("Category exists");
+        }
         return quizCategoryRepository.save(quizCategory);
     }
 
