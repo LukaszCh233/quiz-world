@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("quizWorldTest")
+@ActiveProfiles("test")
 public class AdminServiceTest {
     private final AdminRepository adminRepository;
     private final AdminServiceImpl adminService;

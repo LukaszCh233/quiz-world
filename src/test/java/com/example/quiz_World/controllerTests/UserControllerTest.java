@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("quizWorldTest")
+@ActiveProfiles("test")
 public class UserControllerTest {
 
     @MockBean
@@ -238,9 +238,9 @@ public class UserControllerTest {
         Quiz quiz = new Quiz(1L, null, null, null, null, null);
         List<Result> results = List.of(new Result(1L, user, quiz, null, 100.0));
 
-        when(quizService.findQuizzesResults(principal)).thenReturn(mapEntity.mapQuizResultsToQuizResultsDTO(results));
+        when(quizService.findYourQuizzesResults(principal)).thenReturn(mapEntity.mapQuizResultsToQuizResultsDTO(results));
 
-        mockMvc.perform(get("/user/score"))
+        mockMvc.perform(get("/user/quiz/score"))
                 .andExpect(status().isOk());
     }
 

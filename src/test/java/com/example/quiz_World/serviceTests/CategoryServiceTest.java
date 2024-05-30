@@ -19,7 +19,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("quizWorldTest")
+@ActiveProfiles("test")
 public class CategoryServiceTest {
     private final CategoryServiceImp categoryService;
     private final QuizCategoryRepository quizCategoryRepository;

@@ -3,6 +3,7 @@ package com.example.quiz_World.controllerTests;
 import com.example.quiz_World.entities.Status;
 import com.example.quiz_World.entities.quizEntity.*;
 import com.example.quiz_World.entities.wordSetEntity.*;
+import com.example.quiz_World.repository.WordSetCategoryRepository;
 import com.example.quiz_World.service.CategoryServiceImp;
 import com.example.quiz_World.service.MapEntity;
 import com.example.quiz_World.service.QuizServiceImpl;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("quizWorldTest")
+@ActiveProfiles("test")
 public class CommonControllerTest {
     @MockBean
     CategoryServiceImp categoryService;
@@ -40,8 +41,10 @@ public class CommonControllerTest {
     QuizServiceImpl quizService;
     @MockBean
     WordServiceImpl wordService;
-    @Autowired
+    @MockBean
     MapEntity mapEntity;
+    @MockBean
+    WordSetCategoryRepository wordSetCategoryRepository;
     @Autowired
     WebApplicationContext context;
     @Autowired
@@ -107,17 +110,20 @@ public class CommonControllerTest {
     void shouldCreateQuiz_Test() throws Exception {
         Principal principal = mock(Principal.class);
 
-        QuizCategory quizCategory = new QuizCategory(null, "category");
+        QuizCategory quizCategory = new QuizCategory(1L, "category");
         QuizDTO quizDTO = new QuizDTO();
+        quizDTO.setId(1L);
         quizDTO.setTitle("quiz");
         quizDTO.setCategory("category");
+        String jsonContent = "{\"title\":\"test\", \"quizCategory\":{\"id\":1}, \"status\":\"PUBLIC\"}";
 
-        when(quizService.createQuiz(quizDTO.getTitle(), quizCategory, Status.PUBLIC, principal)).thenReturn(quizDTO);
+
+        when(quizService.createQuiz(quizDTO.getTitle(), quizCategory.getId(), Status.PUBLIC, principal)).thenReturn(quizDTO);
         mockMvc.perform(post("/common/createQuiz")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"quiz\"}")
-                        .content("{\"category\":\"category\"}")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .content(jsonContent)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .principal(principal))
                 .andExpect(status().isOk());
     }
 
@@ -234,16 +240,19 @@ public class CommonControllerTest {
     @Test
     void shouldCreateWordSet_Test() throws Exception {
         Principal principal = mock(Principal.class);
-        WordSetCategory wordSetCategory = new WordSetCategory(null, "category");
+        WordSetCategory wordSetCategory = new WordSetCategory(1L, "category");
         WordSetDTO wordSetDTO = new WordSetDTO();
+        wordSetDTO.setId(1L);
         wordSetDTO.setTitle("test");
         wordSetDTO.setCategory("category");
 
-        String jsonContent = "{\"title\":\"wordSet\", \"category\":\"category\"}";
+        String jsonContent = "{\"title\":\"test\", \"wordSetCategory\":{\"id\":1}, \"status\":\"PUBLIC\"}";
 
-        WordSet wordSet = new WordSet(null, "test", null, null, wordSetCategory, Status.PUBLIC);
 
-        when(wordService.createWordSet(wordSet.getTitle(), wordSetCategory, Status.PUBLIC, principal)).thenReturn(wordSetDTO);
+        WordSet wordSet = new WordSet(1L, "test", null, null, wordSetCategory, Status.PUBLIC);
+
+
+        when(wordService.createWordSet(wordSet.getTitle(), wordSetCategory.getId(), Status.PUBLIC, principal)).thenReturn(wordSetDTO);
         mockMvc.perform(post("/common/createWordSet")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent)

@@ -21,7 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("quizWorldTest")
+@ActiveProfiles("test")
 public class WordServiceTest {
     private final WordServiceImpl wordService;
     private final WordSetRepository wordSetRepository;
@@ -58,7 +58,7 @@ public class WordServiceTest {
         wordSetCategoryRepository.save(wordSetCategory);
 
         //When
-        WordSetDTO createWordSet = wordService.createWordSet("testTitle", wordSetCategory, Status.PUBLIC, new TestPrincipal(user.getEmail()));
+        WordSetDTO createWordSet = wordService.createWordSet("testTitle", wordSetCategory.getId(), Status.PUBLIC, new TestPrincipal(user.getEmail()));
 
         //Then
         assertEquals(wordSetCategory.getName(), createWordSet.getCategory());

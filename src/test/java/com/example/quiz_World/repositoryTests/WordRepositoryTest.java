@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("testQuizWorld")
+@ActiveProfiles("test")
 public class WordRepositoryTest {
     @Autowired
     WordRepository wordRepository;

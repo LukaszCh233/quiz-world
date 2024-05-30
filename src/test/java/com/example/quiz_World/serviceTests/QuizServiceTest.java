@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("quizWorldTest")
+@ActiveProfiles("test")
 public class QuizServiceTest {
     private final QuizRepository quizRepository;
     private final QuizServiceImpl quizService;
@@ -58,7 +58,7 @@ public class QuizServiceTest {
         quizCategoryRepository.save(quizCategory);
 
         //When
-        QuizDTO createQuiz = quizService.createQuiz("testTitle", quizCategory, Status.PUBLIC, new TestPrincipal(user.getEmail()));
+        QuizDTO createQuiz = quizService.createQuiz("testTitle", quizCategory.getId(), Status.PUBLIC, new TestPrincipal(user.getEmail()));
 
         //Then
         assertEquals(quizCategory.getName(), createQuiz.getCategory());
@@ -312,7 +312,7 @@ public class QuizServiceTest {
         resultRepository.save(result1);
 
         //When
-        List<QuizResultDTO> quizzesResults = quizService.findQuizzesResults(new TestPrincipal(user.getEmail()));
+        List<QuizResultDTO> quizzesResults = quizService.findYourQuizzesResults(new TestPrincipal(user.getEmail()));
 
         //Then
         assertEquals(2, quizzesResults.size());
