@@ -39,35 +39,35 @@ public class CommonController {
         return ResponseEntity.ok(quizDTO);
     }
 
-    @GetMapping("/questions/{quizId}")
+    @GetMapping("/quiz/{quizId}/questions")
     public ResponseEntity<?> displayQuestions(@PathVariable Long quizId) {
         List<QuestionDTO> questions = quizService.findQuestionsByQuizId(quizId);
 
         return ResponseEntity.ok(questions);
     }
 
-    @PostMapping("/createQuiz")
+    @PostMapping("/quiz")
     public ResponseEntity<QuizDTO> createQuiz(@RequestBody Quiz quiz, Principal principal) {
         QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory().getId(), quiz.getStatus(), principal);
 
         return ResponseEntity.ok(createQuiz);
     }
 
-    @PostMapping("/addQuestionsToQuiz/{quizId}")
-    public ResponseEntity<?> addQuestionsToQuiz(@PathVariable Long quizId, @RequestBody Question question) {
+    @PostMapping("/quiz/{quizId}/question")
+    public ResponseEntity<?> addQuestionToQuiz(@PathVariable Long quizId, @RequestBody Question question) {
         quizService.addQuestionsToQuiz(quizId, question);
 
         return ResponseEntity.ok("Question added to quiz successfully");
     }
 
-    @GetMapping("/yourQuizzes")
+    @GetMapping("/user-quizzes")
     public ResponseEntity<?> displayYourQuizzes(Principal principal) {
         List<QuizDTO> quizzes = quizService.findYourQuizzes(principal);
 
         return ResponseEntity.ok(quizzes);
     }
 
-    @GetMapping("/quizzes/{categoryId}")
+    @GetMapping("/quizzes/category/{categoryId}")
     public ResponseEntity<List<QuizDTO>> displayQuizzesByCategory(@PathVariable Long categoryId) {
         List<QuizDTO> quizDTOList = quizService.findQuizByCategory(categoryId);
 
@@ -95,35 +95,35 @@ public class CommonController {
         return ResponseEntity.ok(wordSetDTOList);
     }
 
-    @PostMapping("/createWordSet")
+    @PostMapping("/wordSet")
     public ResponseEntity<WordSetDTO> createWordSet(@RequestBody WordSet wordSet, Principal principal) {
         WordSetDTO createWordSet = wordService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory().getId(), wordSet.getStatus(), principal);
 
         return ResponseEntity.ok(createWordSet);
     }
 
-    @PostMapping("/addWordToWordSet/{wordSetId}")
+    @PostMapping("/wordSet/{wordSetId}/word")
     public ResponseEntity<?> addWordToWordSet(@PathVariable Long wordSetId, @RequestBody Word word) {
         wordService.addWordToWordSet(wordSetId, word);
 
         return ResponseEntity.ok("Word added to word set successfully");
     }
 
-    @GetMapping("/yourWordSets")
+    @GetMapping("/user-WordSets")
     public ResponseEntity<List<WordSetDTO>> displayYourWordSets(Principal principal) {
         List<WordSetDTO> wordSetDTOS = wordService.findYourWordSets(principal);
 
         return ResponseEntity.ok(wordSetDTOS);
     }
 
-    @GetMapping("/wordSets/{categoryId}")
+    @GetMapping("/wordSets/category{categoryId}")
     public ResponseEntity<?> displayWordSetsByCategory(@PathVariable Long categoryId) {
         List<WordSetDTO> wordSetDTOS = wordService.findWordSetByCategory(categoryId);
 
         return ResponseEntity.ok(wordSetDTOS);
     }
 
-    @GetMapping("/words/{wordSetId}")
+    @GetMapping("/wordSet/{wordSetId}/words")
     public ResponseEntity<?> displayWords(@PathVariable Long wordSetId) {
         List<WordDTO> words = wordService.findWordsByWordSetId(wordSetId);
 

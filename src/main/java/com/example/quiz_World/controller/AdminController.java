@@ -33,119 +33,119 @@ public class AdminController {
         this.wordService = wordService;
     }
 
-    @GetMapping("/getUsers")
-    public ResponseEntity<?> getUsers() {
+    @GetMapping("/users")
+    public ResponseEntity<?> getAllUsers() {
         List<UserDTO> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @DeleteMapping("/deleteQuizzes")
+    @DeleteMapping("/quizzes")
     public ResponseEntity<?> deleteAllQuizzes() {
         quizService.deleteAllQuizzesForAdmin();
         return ResponseEntity.ok("All Quizzes have been deleted");
     }
 
-    @DeleteMapping("/deleteQuiz/{quizId}")
+    @DeleteMapping("/quiz/{quizId}")
     public ResponseEntity<?> deleteQuiz(@PathVariable Long quizId) {
         quizService.deleteQuizByIdForAdmin(quizId);
         return ResponseEntity.ok("Quiz have been deleted");
     }
 
-    @PostMapping("/addQuizCategory")
+    @PostMapping("/quiz-category")
     public ResponseEntity<QuizCategory> createQuizCategory(@RequestBody QuizCategory quizCategory) {
         QuizCategory createQuizCategory = categoryService.createQuizCategory(quizCategory);
 
         return ResponseEntity.ok(createQuizCategory);
     }
 
-    @PostMapping("/addWordSetCategory")
+    @PostMapping("/wordSet-category")
     public ResponseEntity<WordSetCategory> createWordSetCategory(@RequestBody WordSetCategory wordSetCategory) {
         WordSetCategory createWordSetCategory = categoryService.createWordSetCategory(wordSetCategory);
 
         return ResponseEntity.ok(createWordSetCategory);
     }
 
-    @PutMapping("/updateQuiz/{quizId}")
+    @PutMapping("/quiz/{quizId}")
     public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody Quiz quiz) {
         quizService.updateQuizByIdForAdmin(quizId, quiz);
 
         return ResponseEntity.ok("Quiz updated");
     }
 
-    @PutMapping("/updateQuizQuestion/{quizId}/{questionNumber}")
+    @PutMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> updateQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question question) {
         quizService.updateQuestionByQuestionNumberForAdmin(quizId, questionNumber, question);
 
         return ResponseEntity.ok("Question updated");
     }
 
-    @DeleteMapping("/deleteQuestion/{quizId}/{questionNumber}")
+    @DeleteMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber) {
         quizService.deleteQuestionByNumberQuestionForAdmin(quizId, questionNumber);
         return ResponseEntity.ok("Question has been deleted");
     }
 
-    @DeleteMapping("/deleteQuizCategory/{categoryId}")
+    @DeleteMapping("/quiz-category/{categoryId}")
     public ResponseEntity<?> deleteQuizCategory(@PathVariable Long categoryId) {
         categoryService.deleteQuizCategoryById(categoryId);
         return ResponseEntity.ok("Category has been deleted");
     }
 
-    @DeleteMapping("/deleteAllQuizCategories")
+    @DeleteMapping("/quiz-categories")
     public ResponseEntity<?> deleteAllQuizCategories() {
         categoryService.deleteAllQuizCategories();
         return ResponseEntity.ok("All Categories has been deleted");
     }
 
-    @PutMapping("/updateWordSet/{wordSetId}")
+    @PutMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> updateWordSet(@PathVariable Long wordSetId, @RequestBody WordSet wordSet) {
         wordService.updateWordSetByIdForAdmin(wordSetId, wordSet);
         return ResponseEntity.ok("Word set updated");
     }
 
-    @PutMapping("/updateWord/{wordSetId}/{wordNumber}")
+    @PutMapping("/wordSet/{wordSetId}/word/{wordNumber}")
     public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, @RequestBody Word word) {
         wordService.updateWordForAdmin(wordSetId, wordNumber, word);
         return ResponseEntity.ok("Word updated");
     }
 
-    @DeleteMapping("/deleteWordSets")
+    @DeleteMapping("/wordSets")
     public ResponseEntity<?> deleteAllWordSets() {
         wordService.deleteAllWordSetsForAdmin();
         return ResponseEntity.ok("All word sets has been deleted");
     }
 
-    @DeleteMapping("/deleteWordSet/{wordSetId}")
+    @DeleteMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId) {
         wordService.deleteWordSetByIdForAdmin(wordSetId);
         return ResponseEntity.ok("Word set has been deleted");
     }
 
-    @DeleteMapping("/deleteWord/{wordSetId}/{wordNumber}")
+    @DeleteMapping("/wordSet/{wordSetId}/word/{wordNumber}")
     public ResponseEntity<?> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber) {
         wordService.deleteWordByNumberWordSetForAdmin(wordSetId, wordNumber);
         return ResponseEntity.ok("Word has been deleted");
     }
 
-    @DeleteMapping("/deleteWordSetCategory/{categoryId}")
+    @DeleteMapping("/wordSet-category/{categoryId}")
     public ResponseEntity<?> deleteWordSetCategory(@PathVariable Long categoryId) {
         categoryService.deleteWordSetCategoryById(categoryId);
         return ResponseEntity.ok("Category has been deleted");
     }
 
-    @DeleteMapping("/deleteAllWordSetCategories")
+    @DeleteMapping("/wordSet-categories")
     public ResponseEntity<?> deleteAllWordSetCategories() {
         categoryService.deleteAllWordSetCategories();
         return ResponseEntity.ok("All Categories has been deleted");
     }
 
-    @PutMapping("/updateWordSetCategory/{categoryId}")
+    @PutMapping("/wordSet-category/{categoryId}")
     public ResponseEntity<?> updateWordSetCategory(@PathVariable Long categoryId, @RequestBody WordSetCategory wordSetCategory) {
         WordSetCategory updateCategory = categoryService.updateWordSetCategory(categoryId, wordSetCategory);
         return ResponseEntity.ok(updateCategory);
     }
 
-    @PutMapping("/updateQuizCategory/{categoryId}")
+    @PutMapping("/quiz-category/{categoryId}")
     public ResponseEntity<?> updateQuizCategory(@PathVariable Long categoryId, @RequestBody QuizCategory quizCategory) {
         QuizCategory updateCategory = categoryService.updateQuizCategory(categoryId, quizCategory);
         return ResponseEntity.ok(updateCategory);

@@ -29,42 +29,42 @@ public class UserController {
         this.wordService = wordService;
     }
 
-    @DeleteMapping("/deleteQuizzes")
+    @DeleteMapping("/quizzes")
     public ResponseEntity<?> deleteYourQuizzes(Principal principal) {
         quizService.deleteAllQuizzesForUser(principal);
 
         return ResponseEntity.ok("All quizzes has been deleted");
     }
 
-    @DeleteMapping("/deleteQuestion/{quizId}/{questionNumber}")
+    @DeleteMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, Principal principal) {
         quizService.deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
 
         return ResponseEntity.ok("Question has been deleted");
     }
 
-    @DeleteMapping("/deleteQuiz/{quizId}")
+    @DeleteMapping("/quiz/{quizId}")
     public ResponseEntity<?> deleteYourQuiz(@PathVariable Long quizId, Principal principal) {
         quizService.deleteQuizByIdForUser(quizId, principal);
 
         return ResponseEntity.ok("Quiz has been deleted");
     }
 
-    @PutMapping("/updateQuiz/{quizId}")
+    @PutMapping("/quiz/{quizId}")
     public ResponseEntity<?> updateYourQuiz(@PathVariable Long quizId, @RequestBody Quiz quiz, Principal principal) {
         quizService.updateQuizByIdForUser(quizId, quiz, principal);
 
         return ResponseEntity.ok("Quiz updated");
     }
 
-    @PutMapping("/updateQuizQuestion/{quizId}/{questionNumber}")
-    public ResponseEntity<?> updateYourQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question questions, Principal principal) {
+    @PutMapping("/quiz/{quizId}/question/{questionNumber}")
+    public ResponseEntity<?> updateYourQuizQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question questions, Principal principal) {
         quizService.updateQuestionByQuestionNumberForUser(quizId, questionNumber, questions, principal);
 
         return ResponseEntity.ok("Question updated");
     }
 
-    @PostMapping("/solveQuiz/{quizId}")
+    @PostMapping("/quiz-solve/{quizId}")
     public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
         double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
 
@@ -90,7 +90,7 @@ public class UserController {
         return ResponseEntity.ok(wordSetResultDTOS);
     }
 
-    @PostMapping("/solveWordSet/{wordSetId}")
+    @PostMapping("/wordSet-solve/{wordSetId}")
     public ResponseEntity<?> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
         double score = wordService.solveWordSet(wordSetId, userAnswers, principal);
 
@@ -98,35 +98,35 @@ public class UserController {
     }
 
     @Transactional
-    @DeleteMapping("/deleteWordSets")
+    @DeleteMapping("/wordSets")
     public ResponseEntity<?> deleteAllWordSet(Principal principal) {
         wordService.deleteAllWordSetsForUser(principal);
 
         return ResponseEntity.ok("All word sets has been deleted");
     }
 
-    @DeleteMapping("/deleteWordSet/{wordSetId}")
+    @DeleteMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId, Principal principal) {
         wordService.deleteWordSetByIdForUser(wordSetId, principal);
 
         return ResponseEntity.ok("Word set has been deleted");
     }
 
-    @DeleteMapping("/deleteWord/{wordSetId}/{wordNumber}")
+    @DeleteMapping("/wordSet/{wordSetId}/word/{wordNumber}")
     public ResponseEntity<?> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, Principal principal) {
         wordService.deleteWordByNumberWordSetForUser(wordSetId, wordNumber, principal);
 
         return ResponseEntity.ok("Word has been deleted");
     }
 
-    @PutMapping("/updateWordSet/{wordSetId}")
+    @PutMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> updateYourWordSet(@PathVariable Long wordSetId, @RequestBody WordSet wordSet, Principal principal) {
         wordService.updateWordSetByIdForUser(wordSetId, wordSet, principal);
 
         return ResponseEntity.ok("Word set updated");
     }
 
-    @PutMapping("/updateWord/{wordSetId}/{wordNumber}")
+    @PutMapping("/wordSet/{wordSetId}/word/{wordNumber}")
     public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @RequestBody Word word, @PathVariable Long wordNumber, Principal principal) {
         wordService.updateWordForUser(wordSetId, wordNumber, word, principal);
 
