@@ -1,12 +1,10 @@
 package com.example.quiz_World.entities.wordSetEntity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
+import lombok.*;
 @Entity
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Word {

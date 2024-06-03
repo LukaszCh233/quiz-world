@@ -2,16 +2,16 @@ package com.example.quiz_World.entities.quizEntity;
 
 import com.example.quiz_World.entities.Status;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 
 public class Quiz {
     @Id

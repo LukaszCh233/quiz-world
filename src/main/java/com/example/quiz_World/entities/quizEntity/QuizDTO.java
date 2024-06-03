@@ -1,8 +1,10 @@
 package com.example.quiz_World.entities.quizEntity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 public class QuizDTO {
     private Long id;
     private String title;

@@ -3,14 +3,14 @@ package com.example.quiz_World.entities;
 import com.example.quiz_World.entities.quizEntity.Quiz;
 import com.example.quiz_World.entities.wordSetEntity.WordSet;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Result {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

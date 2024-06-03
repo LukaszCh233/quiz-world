@@ -61,7 +61,7 @@ public class CommonControllerTest {
     @WithMockUser
     @Test
     void shouldDisplayQuizzes_Test() throws Exception {
-        List<Quiz> quizzes = List.of(new Quiz(1L, 1L, "quiz", new QuizCategory(null, "category"), null, Status.PUBLIC));
+        List<Quiz> quizzes = List.of(new Quiz(1L, 1L, "quiz", new QuizCategory(2L, "category"), null, Status.PUBLIC));
 
         when(quizService.findAllPublicQuizzes()).thenReturn(mapEntity.mapQuizzesToQuizzesDTO(quizzes));
 

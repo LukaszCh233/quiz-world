@@ -59,8 +59,6 @@ public class QuizCategoryRepositoryTest {
 
         //Then
         assertEquals(2, quizCategoryList.size());
-        assertTrue(quizCategoryList.contains(quizCategory));
-        assertTrue(quizCategoryList.contains(quizCategory1));
         assertEquals(quizCategoryList.get(0).getId(), quizCategory.getId());
         assertEquals(quizCategoryList.get(0).getName(), quizCategory.getName());
         assertEquals(quizCategoryList.get(1).getId(), quizCategory1.getId());
