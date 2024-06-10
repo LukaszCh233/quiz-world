@@ -1,10 +1,17 @@
-package com.example.quiz_World.serviceTests;
+package com.example.quiz_World.serviceTests.quiz;
 
-import com.example.quiz_World.entities.*;
+import com.example.quiz_World.dto.QuizDTO;
+import com.example.quiz_World.entities.Result;
+import com.example.quiz_World.entities.Role;
+import com.example.quiz_World.entities.Status;
+import com.example.quiz_World.entities.User;
 import com.example.quiz_World.entities.quizEntity.*;
 import com.example.quiz_World.repository.*;
-import com.example.quiz_World.service.QuizServiceImpl;
-import jakarta.transaction.Transactional;
+import com.example.quiz_World.repository.quiz.QuestionRepository;
+import com.example.quiz_World.repository.quiz.QuizCategoryRepository;
+import com.example.quiz_World.repository.quiz.QuizRepository;
+import com.example.quiz_World.service.quiz.QuizService;
+import com.example.quiz_World.serviceTests.TestPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,14 +27,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class QuizServiceTest {
     private final QuizRepository quizRepository;
-    private final QuizServiceImpl quizService;
+    private final QuizService quizService;
     private final UserRepository userRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final QuestionRepository questionRepository;
     private final ResultRepository resultRepository;
 
     @Autowired
-    public QuizServiceTest(QuizRepository quizRepository, QuizServiceImpl quizService, UserRepository userRepository,
+    public QuizServiceTest(QuizRepository quizRepository, QuizService quizService, UserRepository userRepository,
                            QuizCategoryRepository quizCategoryRepository, QuestionRepository questionRepository,
                            ResultRepository resultRepository) {
         this.quizRepository = quizRepository;
@@ -61,28 +66,8 @@ public class QuizServiceTest {
         QuizDTO createQuiz = quizService.createQuiz("testTitle", quizCategory.getId(), Status.PUBLIC, new TestPrincipal(user.getEmail()));
 
         //Then
-        assertEquals(quizCategory.getName(), createQuiz.getCategory());
-        assertEquals("testTitle", createQuiz.getTitle());
-    }
-
-    @Test
-    void shouldAddQuestionToQuiz_Test() {
-        //Given
-        Quiz quiz = new Quiz(null, null, null, null, new ArrayList<>(), null);
-        quizRepository.save(quiz);
-
-        Question question = new Question(null, 1L, "test", null, new ArrayList<>());
-
-        //When
-        quizService.addQuestionsToQuiz(quiz.getId(), question);
-
-        //Then
-        Optional<Question> optionalQuestion = questionRepository.findByQuizIdAndQuestionNumber(quiz.getId(), question.getQuestionNumber());
-        assertTrue(optionalQuestion.isPresent());
-        Question findQuestion = optionalQuestion.get();
-
-        assertEquals(question.getContent(), findQuestion.getContent());
-        assertEquals(question.getQuestionNumber(), findQuestion.getQuestionNumber());
+        assertEquals(quizCategory.getName(), createQuiz.category());
+        assertEquals("testTitle", createQuiz.title());
     }
 
     @Test
@@ -122,10 +107,10 @@ public class QuizServiceTest {
 
         //Then
         assertEquals(2, quizDTOList.size());
-        assertEquals(quiz.getTitle(), quizDTOList.get(0).getTitle());
-        assertEquals(quiz1.getTitle(), quizDTOList.get(1).getTitle());
-        assertEquals(quiz.getQuizCategory().getName(), quizDTOList.get(0).getCategory());
-        assertEquals(quiz1.getQuizCategory().getName(), quizDTOList.get(1).getCategory());
+        assertEquals(quiz.getTitle(), quizDTOList.get(0).title());
+        assertEquals(quiz1.getTitle(), quizDTOList.get(1).title());
+        assertEquals(quiz.getQuizCategory().getName(), quizDTOList.get(0).category());
+        assertEquals(quiz1.getQuizCategory().getName(), quizDTOList.get(1).category());
     }
 
     @Test
@@ -141,7 +126,7 @@ public class QuizServiceTest {
 
         //Then
         assertNotNull(findQuiz);
-        assertEquals(quiz.getTitle(), findQuiz.getTitle());
+        assertEquals(quiz.getTitle(), findQuiz.title());
     }
 
     @Test
@@ -158,25 +143,6 @@ public class QuizServiceTest {
         //Then
         assertEquals(1, quizDTOList.size());
         assertFalse(quizDTOList.isEmpty());
-    }
-
-    @Test
-    void shouldFindQuestionsByQuizId_Test() {
-        //Given
-        Quiz quiz = new Quiz(null, null, null, null, new ArrayList<>(), Status.PUBLIC);
-        quizRepository.save(quiz);
-
-        Question question = new Question(null, 1L, "test", quiz, new ArrayList<>());
-        Question question1 = new Question(null, 2L, "test1", quiz, new ArrayList<>());
-        List<Question> questions = Arrays.asList(question, question1);
-        questionRepository.saveAll(questions);
-
-        quiz.setQuestions(questions);
-        //When
-        List<QuestionDTO> questionList = quizService.findQuestionsByQuizId(quiz.getId());
-
-        //Then
-        assertEquals(2, questionList.size());
     }
 
     @Test
@@ -295,131 +261,6 @@ public class QuizServiceTest {
         //Then
         List<Quiz> quizList = quizRepository.findAll();
         assertTrue(quizList.isEmpty());
-    }
-
-    @Test
-    void shouldFindQuizzesResults_Test() {
-        //Given
-        User user = new User(null, "user", "test1", "testPassword", Role.USER);
-        userRepository.save(user);
-
-        Quiz quiz = new Quiz(null, null, "old", null, null, Status.PRIVATE);
-        quizRepository.save(quiz);
-
-        Result result = new Result(null, user, quiz, null, 100D);
-        Result result1 = new Result(null, user, quiz, null, 50D);
-        resultRepository.save(result);
-        resultRepository.save(result1);
-
-        //When
-        List<QuizResultDTO> quizzesResults = quizService.findYourQuizzesResults(new TestPrincipal(user.getEmail()));
-
-        //Then
-        assertEquals(2, quizzesResults.size());
-        assertFalse(quizzesResults.isEmpty());
-        assertEquals(result.getScore(), quizzesResults.get(0).getScore());
-        assertEquals(result1.getScore(), quizzesResults.get(1).getScore());
-    }
-
-    @Transactional
-    @Test
-    void shouldDeleteQuestionByNumberQuestionForUser_Test() {
-        //Given
-        User user = new User(null, "user", "testEmail1", "testPassword", Role.USER);
-        userRepository.save(user);
-
-        Quiz quiz = new Quiz(null, user.getId(), "old", null, null, Status.PRIVATE);
-        quizRepository.save(quiz);
-
-        Question question = new Question(null, 1L, "test", quiz, new ArrayList<>());
-
-        AnswerToQuiz answerToQuiz = new AnswerToQuiz(null, 1L, "a", true, question);
-        question.getAnswerToQuiz().add(answerToQuiz);
-
-        questionRepository.save(question);
-
-        //When
-        quizService.deleteQuestionByNumberQuestionForUser(quiz.getId(), 1L, new TestPrincipal(user.getEmail()));
-
-        //Then
-        Optional<Question> findQuestion = questionRepository.findByQuizIdAndQuestionNumber(quiz.getId(), 1L);
-        assertFalse(findQuestion.isPresent());
-    }
-
-    @Transactional
-    @Test
-    void shouldDeleteQuestionByNumberQuestionForAdmin_Test() {
-        //Given
-        User user = new User(null, "user", "testEmail", "testPassword", Role.USER);
-        userRepository.save(user);
-
-        Quiz quiz = new Quiz(null, user.getId(), "old", null, null, Status.PUBLIC);
-        quizRepository.save(quiz);
-
-        Question question = new Question(null, 1L, "test", quiz, new ArrayList<>());
-        AnswerToQuiz answerToQuiz = new AnswerToQuiz(null, 1L, "a", true, question);
-        question.getAnswerToQuiz().add(answerToQuiz);
-
-        questionRepository.save(question);
-
-        //When
-        quizService.deleteQuestionByNumberQuestionForAdmin(quiz.getId(), 1L);
-
-        //Then
-        Optional<Question> findQuestion = questionRepository.findByQuizIdAndQuestionNumber(quiz.getId(), 1L);
-        assertFalse(findQuestion.isPresent());
-    }
-
-    @Test
-    void shouldUpdateQuestionByQuestionNumberForUser_Test() {
-        //Given
-        User user = new User(null, "user", "testEmail", "testPassword", Role.USER);
-        userRepository.save(user);
-
-        Quiz quiz = new Quiz(null, user.getId(), "old", null, null, Status.PRIVATE);
-        quizRepository.save(quiz);
-
-        Question question = new Question(null, 1L, "test", quiz, new ArrayList<>());
-        AnswerToQuiz answerToQuiz = new AnswerToQuiz(null, 1L, "a", true, question);
-        question.getAnswerToQuiz().add(answerToQuiz);
-
-        questionRepository.save(question);
-
-        Question updateQuestion = new Question(null, 1L, "update", quiz, new ArrayList<>());
-        updateQuestion.getAnswerToQuiz().add(answerToQuiz);
-
-        //When
-        Question result = quizService.updateQuestionByQuestionNumberForUser(quiz.getId(), question.getQuestionNumber(), updateQuestion, new TestPrincipal(user.getEmail()));
-
-        //Then
-        assertEquals(question.getId(), result.getId());
-        assertEquals(updateQuestion.getContent(), result.getContent());
-    }
-
-    @Test
-    void shouldUpdateQuestionByQuestionNumberForAdmin_Test() {
-        //Given
-        User user = new User(null, "user", "testEmail", "testPassword", Role.USER);
-        userRepository.save(user);
-
-        Quiz quiz = new Quiz(null, user.getId(), "old", null, null, Status.PRIVATE);
-        quizRepository.save(quiz);
-
-        Question question = new Question(null, 1L, "test", quiz, new ArrayList<>());
-        AnswerToQuiz answerToQuiz = new AnswerToQuiz(null, 1L, "a", true, question);
-        question.getAnswerToQuiz().add(answerToQuiz);
-
-        questionRepository.save(question);
-
-        Question updateQuestion = new Question(null, 1L, "update", quiz, new ArrayList<>());
-        updateQuestion.getAnswerToQuiz().add(answerToQuiz);
-
-        //When
-        Question result = quizService.updateQuestionByQuestionNumberForAdmin(quiz.getId(), question.getQuestionNumber(), updateQuestion);
-
-        //Then
-        assertEquals(question.getId(), result.getId());
-        assertEquals(updateQuestion.getContent(), result.getContent());
     }
 
     @Test
