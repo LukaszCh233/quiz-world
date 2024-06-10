@@ -1,4 +1,4 @@
-package com.example.quiz_World.repository;
+package com.example.quiz_World.repository.quiz;
 
 import com.example.quiz_World.entities.Status;
 import com.example.quiz_World.entities.quizEntity.Quiz;

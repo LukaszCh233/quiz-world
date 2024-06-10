@@ -1,7 +1,7 @@
 package com.example.quiz_World.repositoryTests;
 
 import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
-import com.example.quiz_World.repository.WordSetCategoryRepository;
+import com.example.quiz_World.repository.words.WordSetCategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

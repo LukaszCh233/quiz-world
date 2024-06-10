@@ -1,4 +1,4 @@
-package com.example.quiz_World.repository;
+package com.example.quiz_World.repository.words;
 
 import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,8 @@
 package com.example.quiz_World.repositoryTests;
 
 import com.example.quiz_World.entities.quizEntity.QuizCategory;
-import com.example.quiz_World.repository.QuizCategoryRepository;
-import com.example.quiz_World.repository.QuizRepository;
+import com.example.quiz_World.repository.quiz.QuizCategoryRepository;
+import com.example.quiz_World.repository.quiz.QuizRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
