@@ -1,8 +1,20 @@
-package com.example.quiz_World.service;
+package com.example.quiz_World.service.words;
 
-import com.example.quiz_World.entities.*;
-import com.example.quiz_World.entities.wordSetEntity.*;
-import com.example.quiz_World.repository.*;
+import com.example.quiz_World.dto.WordSetDTO;
+import com.example.quiz_World.entities.Admin;
+import com.example.quiz_World.entities.Result;
+import com.example.quiz_World.entities.Status;
+import com.example.quiz_World.entities.User;
+import com.example.quiz_World.entities.wordSetEntity.AnswerToWordSet;
+import com.example.quiz_World.entities.wordSetEntity.Word;
+import com.example.quiz_World.entities.wordSetEntity.WordSet;
+import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
+import com.example.quiz_World.mapper.MapEntity;
+import com.example.quiz_World.repository.AdminRepository;
+import com.example.quiz_World.repository.ResultRepository;
+import com.example.quiz_World.repository.UserRepository;
+import com.example.quiz_World.repository.words.WordSetCategoryRepository;
+import com.example.quiz_World.repository.words.WordSetRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -14,25 +26,64 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class WordServiceImpl {
-    private final WordRepository wordRepository;
+public class WordSetService {
     private final UserRepository userRepository;
-    private final AdminRepository adminRepository;
     private final WordSetRepository wordSetRepository;
-    private final MapEntity mapEntity;
-    private final WordSetCategoryRepository wordSetCategoryRepository;
     private final ResultRepository resultRepository;
+    private final WordSetCategoryRepository wordSetCategoryRepository;
+    private final AdminRepository adminRepository;
+    private final MapEntity mapEntity;
 
-    public WordServiceImpl(WordRepository wordRepository, UserRepository userRepository, AdminRepository adminRepository, WordSetRepository wordSetRepository,
-                           MapEntity mapEntity, WordSetCategoryRepository wordSetCategoryRepository,
-                           ResultRepository resultRepository) {
-        this.wordRepository = wordRepository;
+
+    public WordSetService(UserRepository userRepository, WordSetRepository wordSetRepository,
+                          ResultRepository resultRepository, WordSetCategoryRepository wordSetCategoryRepository,
+                          AdminRepository adminRepository, MapEntity mapEntity) {
         this.userRepository = userRepository;
-        this.adminRepository = adminRepository;
         this.wordSetRepository = wordSetRepository;
-        this.mapEntity = mapEntity;
-        this.wordSetCategoryRepository = wordSetCategoryRepository;
         this.resultRepository = resultRepository;
+        this.wordSetCategoryRepository = wordSetCategoryRepository;
+        this.adminRepository = adminRepository;
+        this.mapEntity = mapEntity;
+
+    }
+
+    public double solveWordSet(Long wordSetId, List<AnswerToWordSet> userAnswers, Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+
+        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
+        Result prviousResult = resultRepository.findByUserIdAndWordSetId(user.getId(), wordSetId);
+
+        List<Word> words = new ArrayList<>(wordSet.getWords());
+
+        Collections.shuffle(words);
+
+        int point = 0;
+
+        if (userAnswers.size() != words.size()) {
+            throw new IllegalArgumentException("Number of user answers does not match the number of words in the set");
+        }
+        for (int i = 0; i < words.size(); i++) {
+            Word word = words.get(i);
+            AnswerToWordSet userAnswer = userAnswers.get(i);
+
+            if (word.getTranslation().equalsIgnoreCase(userAnswer.getAnswer())) {
+                point++;
+            }
+        }
+        double score = (double) point / wordSet.getWords().size() * 100;
+        if (prviousResult == null || score > prviousResult.getScore()) {
+
+            Result result = new Result();
+            result.setUser(user);
+            result.setScore(score);
+            result.setWordSet(wordSet);
+            resultRepository.save(result);
+        }
+        if (prviousResult != null && score > prviousResult.getScore()) {
+            resultRepository.delete(prviousResult);
+        }
+        return score;
     }
 
     public WordSetDTO createWordSet(String title, Long wordSetCategoryId, Status status, Principal principal) {
@@ -59,18 +110,6 @@ public class WordServiceImpl {
         wordSetRepository.save(wordSet);
 
         return mapEntity.mapWordSetToWordSetDTO(wordSet);
-    }
-
-    public void addWordToWordSet(Long wordSetId, Word word) {
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Not found word set"));
-
-        word.setWordSet(wordSet);
-        word.setWordNumber(word.getWordNumber());
-        word.setWord(word.getWord());
-        word.setTranslation(word.getTranslation());
-        wordSet.getWords().add(word);
-
-        wordSetRepository.save(wordSet);
     }
 
     public List<WordSetDTO> findPublicWordSets() {
@@ -116,16 +155,11 @@ public class WordServiceImpl {
         return mapEntity.mapWordSetToWordSetDTO(wordSet);
     }
 
-    public List<WordDTO> findWordsByWordSetId(Long wordSetId) {
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
-        if (wordSet.getStatus().equals(Status.PRIVATE)) {
-            throw new EntityNotFoundException("Word set not found");
-        }
-        List<Word> wordList = wordSet.getWords();
-        if (wordList.isEmpty()) {
-            throw new EntityNotFoundException("Word set is empty");
-        }
-        return mapEntity.mapWordListToWordListDTO(wordList);
+    public List<WordSet> findWordSetsByUserPrincipal(Principal principal) {
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+
+        return Optional.ofNullable(wordSetRepository.findByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found word sets"));
     }
 
     @Transactional
@@ -154,19 +188,6 @@ public class WordServiceImpl {
         wordSetRepository.delete(wordSet);
     }
 
-    public void deleteWordByNumberWordSetForUser(Long wordSetId, Long numberWord, Principal principal) {
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
-
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
-        if (!wordSet.getUserId().equals(user.getId())) {
-            throw new UnsupportedOperationException("User is not authorized");
-        }
-        Word word = wordRepository.findByWordSetIdAndWordNumber(wordSetId, numberWord).orElseThrow(() -> new EntityNotFoundException("Word not found"));
-
-        wordRepository.delete(word);
-    }
-
     public WordSet updateWordSetByIdForUser(Long id, WordSet wordSet, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
@@ -185,89 +206,6 @@ public class WordServiceImpl {
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
         return wordSetRepository.save(wordSetToUpdate);
-    }
-
-    public Word updateWordForUser(Long wordSetId, Long wordNumber, Word word, Principal principal) {
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
-
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
-        if (!wordSet.getUserId().equals(user.getId())) {
-            throw new UnsupportedOperationException("User is not authorized to update word");
-        }
-        Word wordToUpdate = wordRepository.findByWordSetIdAndWordNumber(wordSetId, wordNumber).orElseThrow(() -> new EntityNotFoundException("Not found word"));
-
-        wordToUpdate.setWord(word.getWord());
-        wordToUpdate.setTranslation(word.getTranslation());
-
-        return wordRepository.save(wordToUpdate);
-    }
-
-    public double solveWordSet(Long wordSetId, List<AnswerToWordSet> userAnswers, Principal principal) {
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
-
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
-        Result prviousResult = resultRepository.findByUserIdAndWordSetId(user.getId(), wordSetId);
-
-        List<Word> words = new ArrayList<>(wordSet.getWords());
-
-        Collections.shuffle(words);
-
-        int point = 0;
-
-        if (userAnswers.size() != words.size()) {
-            throw new IllegalArgumentException("Number of user answers does not match the number of words in the set");
-        }
-        for (int i = 0; i < words.size(); i++) {
-            Word word = words.get(i);
-            AnswerToWordSet userAnswer = userAnswers.get(i);
-
-            if (word.getTranslation().equalsIgnoreCase(userAnswer.getAnswer())) {
-                point++;
-            }
-        }
-        double score = (double) point / wordSet.getWords().size() * 100;
-        if (prviousResult == null || score > prviousResult.getScore()) {
-
-            Result result = new Result();
-            result.setUser(user);
-            result.setScore(score);
-            result.setWordSet(wordSet);
-            resultRepository.save(result);
-        }
-        if (prviousResult != null && score > prviousResult.getScore()) {
-            resultRepository.delete(prviousResult);
-        }
-        return score;
-    }
-    public List<WordSetResultDTO> findYourWordsResults(Principal principal) {
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
-
-        List<Result> results = resultRepository.findByUserId(user.getId());
-        if (results.isEmpty()) {
-            throw new EntityNotFoundException("Score list is empty");
-        }
-        return mapEntity.mapWordSetResultsToWordSetResultsDTO(results);
-    }
-
-    public List<WordSet> findWordSetsByUserPrincipal(Principal principal) {
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
-
-        return Optional.ofNullable(wordSetRepository.findByUserId(user.getId())).orElseThrow(() -> new EntityNotFoundException("Not found word sets"));
-    }
-
-    public Word updateWordForAdmin(Long wordSetId, Long wordNumber, Word word) {
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
-
-        Word wordToUpdate = wordRepository.findByWordSetIdAndWordNumber(wordSet.getId(), wordNumber).orElseThrow(() -> new EntityNotFoundException("Not found word"));
-
-        wordToUpdate.setWord(word.getWord());
-        wordToUpdate.setTranslation(word.getTranslation());
-
-        return wordRepository.save(wordToUpdate);
     }
 
     public WordSet updateWordSetByIdForAdmin(Long id, WordSet wordSet) {
@@ -301,13 +239,5 @@ public class WordServiceImpl {
         resultRepository.deleteByWordSet(wordSet);
 
         wordSetRepository.delete(wordSet);
-    }
-
-    public void deleteWordByNumberWordSetForAdmin(Long wordSetId, Long numberWord) {
-        WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
-
-        Word word = wordRepository.findByWordSetIdAndWordNumber(wordSet.getId(), numberWord).orElseThrow(() -> new EntityNotFoundException("Word not found"));
-
-        wordRepository.delete(word);
     }
 }
