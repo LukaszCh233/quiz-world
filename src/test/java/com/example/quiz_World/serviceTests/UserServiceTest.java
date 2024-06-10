@@ -1,12 +1,11 @@
 package com.example.quiz_World.serviceTests;
 
+import com.example.quiz_World.dto.UserDTO;
 import com.example.quiz_World.entities.Role;
 import com.example.quiz_World.entities.User;
-import com.example.quiz_World.entities.UserDTO;
-import com.example.quiz_World.exceptions.ExistsException;
-import com.example.quiz_World.repository.ResultRepository;
+import com.example.quiz_World.exception.ExistsException;
 import com.example.quiz_World.repository.UserRepository;
-import com.example.quiz_World.service.UserServiceImpl;
+import com.example.quiz_World.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,19 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class UserServiceTest {
     private final UserRepository userRepository;
-    private final UserServiceImpl userService;
-    private final ResultRepository resultRepository;
+    private final UserService userService;
 
     @Autowired
-    public UserServiceTest(UserRepository userRepository, UserServiceImpl userService, ResultRepository resultRepository) {
+    public UserServiceTest(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
-        this.resultRepository = resultRepository;
+
     }
 
     @BeforeEach
     void setUp() {
-        resultRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -45,9 +42,9 @@ public class UserServiceTest {
 
         //Then
         assertNotNull(createUser);
-        assertEquals(user.getId(), createUser.getId());
-        assertEquals(user.getEmail(), createUser.getEmail());
-        assertEquals(user.getName(), createUser.getName());
+        assertEquals(user.getId(), createUser.id());
+        assertEquals(user.getEmail(), createUser.email());
+        assertEquals(user.getName(), createUser.name());
     }
 
     @Test

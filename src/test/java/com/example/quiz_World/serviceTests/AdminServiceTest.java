@@ -1,11 +1,11 @@
 package com.example.quiz_World.serviceTests;
 
 import com.example.quiz_World.entities.Admin;
-import com.example.quiz_World.entities.AdminDTO;
+import com.example.quiz_World.dto.AdminDTO;
 import com.example.quiz_World.entities.Role;
-import com.example.quiz_World.exceptions.ExistsException;
+import com.example.quiz_World.exception.ExistsException;
 import com.example.quiz_World.repository.AdminRepository;
-import com.example.quiz_World.service.AdminServiceImpl;
+import com.example.quiz_World.service.AdminService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class AdminServiceTest {
     private final AdminRepository adminRepository;
-    private final AdminServiceImpl adminService;
+    private final AdminService adminService;
 
     @Autowired
-    public AdminServiceTest(AdminRepository adminRepository, AdminServiceImpl adminService) {
+    public AdminServiceTest(AdminRepository adminRepository, AdminService adminService) {
         this.adminRepository = adminRepository;
         this.adminService = adminService;
     }
@@ -41,9 +41,9 @@ public class AdminServiceTest {
 
         //Then
         assertNotNull(createAdmin);
-        assertEquals(admin.getId(), createAdmin.getId());
-        assertEquals(admin.getEmail(), createAdmin.getEmail());
-        assertEquals(admin.getName(), createAdmin.getName());
+        assertEquals(admin.getId(), createAdmin.id());
+        assertEquals(admin.getEmail(), createAdmin.email());
+        assertEquals(admin.getName(), createAdmin.name());
     }
 
     @Test

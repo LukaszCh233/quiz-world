@@ -1,4 +1,4 @@
-package com.example.quiz_World.exceptions;
+package com.example.quiz_World.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;

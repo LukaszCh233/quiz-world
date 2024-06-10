@@ -1,16 +1,21 @@
 package com.example.quiz_World.controller;
 
-import com.example.quiz_World.entities.UserDTO;
+import com.example.quiz_World.dto.AdminDTO;
+import com.example.quiz_World.dto.UserDTO;
 import com.example.quiz_World.entities.quizEntity.Question;
 import com.example.quiz_World.entities.quizEntity.Quiz;
 import com.example.quiz_World.entities.quizEntity.QuizCategory;
 import com.example.quiz_World.entities.wordSetEntity.Word;
 import com.example.quiz_World.entities.wordSetEntity.WordSet;
 import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
-import com.example.quiz_World.service.CategoryServiceImp;
-import com.example.quiz_World.service.QuizServiceImpl;
-import com.example.quiz_World.service.UserServiceImpl;
-import com.example.quiz_World.service.WordServiceImpl;
+import com.example.quiz_World.service.AdminService;
+import com.example.quiz_World.service.UserService;
+import com.example.quiz_World.service.category.QuizCategoryService;
+import com.example.quiz_World.service.category.WordSetCategoryService;
+import com.example.quiz_World.service.quiz.QuizQuestionService;
+import com.example.quiz_World.service.quiz.QuizService;
+import com.example.quiz_World.service.words.WordSetService;
+import com.example.quiz_World.service.words.WordsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,23 +25,39 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    private final UserServiceImpl userService;
-    private final QuizServiceImpl quizService;
-    private final CategoryServiceImp categoryService;
-    private final WordServiceImpl wordService;
+    private final UserService userService;
+    private final AdminService adminService;
+    private final QuizService quizService;
+    private final WordSetCategoryService wordSetCategoryService;
+    private final QuizCategoryService quizCategoryService;
+    private final WordsService wordService;
+    private final QuizQuestionService quizQuestionService;
+    private final WordSetService wordSetService;
 
-    public AdminController(UserServiceImpl userService, QuizServiceImpl quizService, CategoryServiceImp categoryService,
-                           WordServiceImpl wordService) {
+    public AdminController(UserService userService, AdminService adminService, QuizService quizService,
+                           WordSetCategoryService wordSetCategoryService, WordsService wordService,
+                           QuizQuestionService quizQuestionService, WordSetService wordSetService,
+                           QuizCategoryService quizCategoryService) {
         this.userService = userService;
+        this.adminService = adminService;
         this.quizService = quizService;
-        this.categoryService = categoryService;
+        this.wordSetCategoryService = wordSetCategoryService;
         this.wordService = wordService;
+        this.quizQuestionService = quizQuestionService;
+        this.wordSetService = wordSetService;
+        this.quizCategoryService = quizCategoryService;
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/admins")
+    public ResponseEntity<List<AdminDTO>> getAllAdmins() {
+        List<AdminDTO> admins = adminService.findAllAdmins();
+        return ResponseEntity.ok(admins);
     }
 
     @DeleteMapping("/quizzes")
@@ -53,14 +74,14 @@ public class AdminController {
 
     @PostMapping("/quiz-category")
     public ResponseEntity<QuizCategory> createQuizCategory(@RequestBody QuizCategory quizCategory) {
-        QuizCategory createQuizCategory = categoryService.createQuizCategory(quizCategory);
+        QuizCategory createQuizCategory = quizCategoryService.createQuizCategory(quizCategory);
 
         return ResponseEntity.ok(createQuizCategory);
     }
 
     @PostMapping("/wordSet-category")
     public ResponseEntity<WordSetCategory> createWordSetCategory(@RequestBody WordSetCategory wordSetCategory) {
-        WordSetCategory createWordSetCategory = categoryService.createWordSetCategory(wordSetCategory);
+        WordSetCategory createWordSetCategory = wordSetCategoryService.createWordSetCategory(wordSetCategory);
 
         return ResponseEntity.ok(createWordSetCategory);
     }
@@ -74,32 +95,32 @@ public class AdminController {
 
     @PutMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> updateQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question question) {
-        quizService.updateQuestionByQuestionNumberForAdmin(quizId, questionNumber, question);
+        quizQuestionService.updateQuestionByQuestionNumberForAdmin(quizId, questionNumber, question);
 
         return ResponseEntity.ok("Question updated");
     }
 
     @DeleteMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber) {
-        quizService.deleteQuestionByNumberQuestionForAdmin(quizId, questionNumber);
+        quizQuestionService.deleteQuestionByNumberQuestionForAdmin(quizId, questionNumber);
         return ResponseEntity.ok("Question has been deleted");
     }
 
     @DeleteMapping("/quiz-category/{categoryId}")
     public ResponseEntity<?> deleteQuizCategory(@PathVariable Long categoryId) {
-        categoryService.deleteQuizCategoryById(categoryId);
+        quizCategoryService.deleteQuizCategoryById(categoryId);
         return ResponseEntity.ok("Category has been deleted");
     }
 
     @DeleteMapping("/quiz-categories")
     public ResponseEntity<?> deleteAllQuizCategories() {
-        categoryService.deleteAllQuizCategories();
+        quizCategoryService.deleteAllQuizCategories();
         return ResponseEntity.ok("All Categories has been deleted");
     }
 
     @PutMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> updateWordSet(@PathVariable Long wordSetId, @RequestBody WordSet wordSet) {
-        wordService.updateWordSetByIdForAdmin(wordSetId, wordSet);
+        wordSetService.updateWordSetByIdForAdmin(wordSetId, wordSet);
         return ResponseEntity.ok("Word set updated");
     }
 
@@ -111,13 +132,13 @@ public class AdminController {
 
     @DeleteMapping("/wordSets")
     public ResponseEntity<?> deleteAllWordSets() {
-        wordService.deleteAllWordSetsForAdmin();
+        wordSetService.deleteAllWordSetsForAdmin();
         return ResponseEntity.ok("All word sets has been deleted");
     }
 
     @DeleteMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId) {
-        wordService.deleteWordSetByIdForAdmin(wordSetId);
+        wordSetService.deleteWordSetByIdForAdmin(wordSetId);
         return ResponseEntity.ok("Word set has been deleted");
     }
 
@@ -129,25 +150,25 @@ public class AdminController {
 
     @DeleteMapping("/wordSet-category/{categoryId}")
     public ResponseEntity<?> deleteWordSetCategory(@PathVariable Long categoryId) {
-        categoryService.deleteWordSetCategoryById(categoryId);
+        wordSetCategoryService.deleteWordSetCategoryById(categoryId);
         return ResponseEntity.ok("Category has been deleted");
     }
 
     @DeleteMapping("/wordSet-categories")
     public ResponseEntity<?> deleteAllWordSetCategories() {
-        categoryService.deleteAllWordSetCategories();
+        wordSetCategoryService.deleteAllWordSetCategories();
         return ResponseEntity.ok("All Categories has been deleted");
     }
 
     @PutMapping("/wordSet-category/{categoryId}")
     public ResponseEntity<?> updateWordSetCategory(@PathVariable Long categoryId, @RequestBody WordSetCategory wordSetCategory) {
-        WordSetCategory updateCategory = categoryService.updateWordSetCategory(categoryId, wordSetCategory);
+        WordSetCategory updateCategory = wordSetCategoryService.updateWordSetCategory(categoryId, wordSetCategory);
         return ResponseEntity.ok(updateCategory);
     }
 
     @PutMapping("/quiz-category/{categoryId}")
     public ResponseEntity<?> updateQuizCategory(@PathVariable Long categoryId, @RequestBody QuizCategory quizCategory) {
-        QuizCategory updateCategory = categoryService.updateQuizCategory(categoryId, quizCategory);
+        QuizCategory updateCategory = quizCategoryService.updateQuizCategory(categoryId, quizCategory);
         return ResponseEntity.ok(updateCategory);
     }
 }

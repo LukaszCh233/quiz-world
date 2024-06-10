@@ -1,13 +1,20 @@
 package com.example.quiz_World.controllerTests;
 
+import com.example.quiz_World.dto.*;
 import com.example.quiz_World.entities.Status;
-import com.example.quiz_World.entities.quizEntity.*;
-import com.example.quiz_World.entities.wordSetEntity.*;
-import com.example.quiz_World.repository.WordSetCategoryRepository;
-import com.example.quiz_World.service.CategoryServiceImp;
-import com.example.quiz_World.service.MapEntity;
-import com.example.quiz_World.service.QuizServiceImpl;
-import com.example.quiz_World.service.WordServiceImpl;
+import com.example.quiz_World.entities.quizEntity.Question;
+import com.example.quiz_World.entities.quizEntity.Quiz;
+import com.example.quiz_World.entities.quizEntity.QuizCategory;
+import com.example.quiz_World.entities.wordSetEntity.Word;
+import com.example.quiz_World.entities.wordSetEntity.WordSet;
+import com.example.quiz_World.entities.wordSetEntity.WordSetCategory;
+import com.example.quiz_World.mapper.MapEntity;
+import com.example.quiz_World.service.category.QuizCategoryService;
+import com.example.quiz_World.service.category.WordSetCategoryService;
+import com.example.quiz_World.service.quiz.QuizQuestionService;
+import com.example.quiz_World.service.quiz.QuizService;
+import com.example.quiz_World.service.words.WordSetService;
+import com.example.quiz_World.service.words.WordsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +43,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class CommonControllerTest {
     @MockBean
-    CategoryServiceImp categoryService;
+    WordSetCategoryService wordSetCategoryService;
     @MockBean
-    QuizServiceImpl quizService;
+    QuizService quizService;
     @MockBean
-    WordServiceImpl wordService;
+    QuizQuestionService quizQuestionService;
+    @MockBean
+    WordsService wordService;
+    @MockBean
+    WordSetService wordSetService;
+    @MockBean
+    QuizCategoryService quizCategoryService;
     @MockBean
     MapEntity mapEntity;
-    @MockBean
-    WordSetCategoryRepository wordSetCategoryRepository;
     @Autowired
     WebApplicationContext context;
     @Autowired
@@ -74,9 +85,8 @@ public class CommonControllerTest {
     @Test
     void shouldDisplayQuiz_Test() throws Exception {
         Long quizId = 1L;
-        QuizDTO quizDTO = new QuizDTO();
-        quizDTO.setTitle("quiz");
-        quizDTO.setCategory("category");
+        QuizDTO quizDTO = new QuizDTO(null,"quiz","category");
+
 
         when(quizService.findQuizById(quizId)).thenReturn(quizDTO);
 
@@ -91,14 +101,13 @@ public class CommonControllerTest {
     @Test
     void shouldDisplayQuestions_Test() throws Exception {
         Long quizId = 1L;
-        QuestionDTO questionDTO = new QuestionDTO();
-        questionDTO.setQuestionNumber(1L);
-        questionDTO.setQuestionContent("question");
+        QuestionDTO questionDTO = new QuestionDTO(1L,"question",null);
+
         List<QuestionDTO> questionDTOS = List.of(questionDTO);
 
-        when(quizService.findQuestionsByQuizId(quizId)).thenReturn(questionDTOS);
+        when(quizQuestionService.findQuestionsByQuizId(quizId)).thenReturn(questionDTOS);
 
-        mockMvc.perform(get("/common/questions/{quizId}", quizId)
+        mockMvc.perform(get("/common/quiz/{quizId}/questions", quizId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].questionNumber").value(1))
@@ -111,15 +120,13 @@ public class CommonControllerTest {
         Principal principal = mock(Principal.class);
 
         QuizCategory quizCategory = new QuizCategory(1L, "category");
-        QuizDTO quizDTO = new QuizDTO();
-        quizDTO.setId(1L);
-        quizDTO.setTitle("quiz");
-        quizDTO.setCategory("category");
+        QuizDTO quizDTO = new QuizDTO(1L,"quiz","category");
+
         String jsonContent = "{\"title\":\"test\", \"quizCategory\":{\"id\":1}, \"status\":\"PUBLIC\"}";
 
 
-        when(quizService.createQuiz(quizDTO.getTitle(), quizCategory.getId(), Status.PUBLIC, principal)).thenReturn(quizDTO);
-        mockMvc.perform(post("/common/createQuiz")
+        when(quizService.createQuiz(quizDTO.title(), quizCategory.getId(), Status.PUBLIC, principal)).thenReturn(quizDTO);
+        mockMvc.perform(post("/common/quiz")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent)
                         .accept(MediaType.APPLICATION_JSON)
@@ -132,14 +139,13 @@ public class CommonControllerTest {
     void shouldDisplayYourQuizzes_Test() throws Exception {
         Principal principal = mock(Principal.class);
 
-        QuizDTO quizDTO = new QuizDTO();
-        quizDTO.setTitle("quiz");
-        quizDTO.setCategory("category");
+        QuizDTO quizDTO = new QuizDTO(null,"quiz","category");
+
         List<QuizDTO> quizDTOS = List.of(quizDTO);
 
         when(quizService.findYourQuizzes(principal)).thenReturn(quizDTOS);
 
-        mockMvc.perform(get("/common/yourQuizzes")
+        mockMvc.perform(get("/common/user-quizzes")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -148,14 +154,13 @@ public class CommonControllerTest {
     @Test
     void shouldDisplayQuizByCategory_Test() throws Exception {
         QuizCategory quizCategory = new QuizCategory(1L, "category");
-        QuizDTO quizDTO = new QuizDTO();
-        quizDTO.setTitle("quiz");
-        quizDTO.setCategory(quizCategory.getName());
+        QuizDTO quizDTO = new QuizDTO(null,"quiz","category");
+
         List<QuizDTO> quizDTOS = List.of(quizDTO);
 
         when(quizService.findQuizByCategory(quizCategory.getId())).thenReturn(quizDTOS);
 
-        mockMvc.perform(get("/common/quizzes/{categoryId}", quizCategory.getId())
+        mockMvc.perform(get("/common/quizzes/category/{categoryId}", quizCategory.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -163,11 +168,11 @@ public class CommonControllerTest {
     @WithMockUser
     @Test
     void shouldDisplayQuizCategories_Test() throws Exception {
-        QuizCategoryDTO quizCategoryDTO = new QuizCategoryDTO();
-        quizCategoryDTO.setName("category");
+        QuizCategoryDTO quizCategoryDTO = new QuizCategoryDTO("category");
+
         List<QuizCategoryDTO> quizCategoryDTOS = List.of(quizCategoryDTO);
 
-        when(categoryService.findAllQuizCategories()).thenReturn(quizCategoryDTOS);
+        when(quizCategoryService.findAllQuizCategories()).thenReturn(quizCategoryDTOS);
         mockMvc.perform(get("/common/quizCategories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -177,11 +182,11 @@ public class CommonControllerTest {
     @WithMockUser
     @Test
     void shouldDisplayWordSetCategories_Test() throws Exception {
-        WordSetCategoryDTO wordSetCategoryDTO = new WordSetCategoryDTO();
-        wordSetCategoryDTO.setName("category");
+        WordSetCategoryDTO wordSetCategoryDTO = new WordSetCategoryDTO("category");
+
         List<WordSetCategoryDTO> wordSetCategoryDTOList = List.of(wordSetCategoryDTO);
 
-        when(categoryService.findAllWordSetCategories()).thenReturn(wordSetCategoryDTOList);
+        when(wordSetCategoryService.findAllWordSetCategories()).thenReturn(wordSetCategoryDTOList);
         mockMvc.perform(get("/common/wordSetCategories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -192,11 +197,9 @@ public class CommonControllerTest {
     @Test
     void shouldDisplayWordSet_Test() throws Exception {
         Long wordSetId = 1L;
-        WordSetDTO wordSetDTO = new WordSetDTO();
-        wordSetDTO.setTitle("wordSet");
-        wordSetDTO.setCategory("category");
+        WordSetDTO wordSetDTO = new WordSetDTO(null,"wordSet","category");
 
-        when(wordService.findWordSetById(wordSetId)).thenReturn(wordSetDTO);
+        when(wordSetService.findWordSetById(wordSetId)).thenReturn(wordSetDTO);
 
         mockMvc.perform(get("/common/wordSet/{id}", wordSetId)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -208,11 +211,10 @@ public class CommonControllerTest {
     @WithMockUser
     @Test
     void shouldDisplayWordSets_Test() throws Exception {
-        WordSetDTO wordSetDTO = new WordSetDTO();
-        wordSetDTO.setTitle("wordSet");
-        wordSetDTO.setCategory("category");
+        WordSetDTO wordSetDTO = new WordSetDTO(null,"wordSet","category");
+
         List<WordSetDTO> wordSetDTOList = List.of(wordSetDTO);
-        when(wordService.findPublicWordSets()).thenReturn(wordSetDTOList);
+        when(wordSetService.findPublicWordSets()).thenReturn(wordSetDTOList);
 
         mockMvc.perform(get("/common/wordSets")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -224,14 +226,13 @@ public class CommonControllerTest {
     void shouldDisplayYourWordSets_Test() throws Exception {
         Principal principal = mock(Principal.class);
 
-        WordSetDTO wordSetDTO = new WordSetDTO();
-        wordSetDTO.setTitle("wordSet");
-        wordSetDTO.setCategory("category");
+        WordSetDTO wordSetDTO = new WordSetDTO(null,"wordSet","category");
+
         List<WordSetDTO> wordSetDTOList = List.of(wordSetDTO);
 
-        when(wordService.findYourWordSets(principal)).thenReturn(wordSetDTOList);
+        when(wordSetService.findYourWordSets(principal)).thenReturn(wordSetDTOList);
 
-        mockMvc.perform(get("/common/yourWordSets")
+        mockMvc.perform(get("/common/user-WordSets")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -241,19 +242,14 @@ public class CommonControllerTest {
     void shouldCreateWordSet_Test() throws Exception {
         Principal principal = mock(Principal.class);
         WordSetCategory wordSetCategory = new WordSetCategory(1L, "category");
-        WordSetDTO wordSetDTO = new WordSetDTO();
-        wordSetDTO.setId(1L);
-        wordSetDTO.setTitle("test");
-        wordSetDTO.setCategory("category");
+        WordSetDTO wordSetDTO = new WordSetDTO(1L,"wordSet","category");
 
         String jsonContent = "{\"title\":\"test\", \"wordSetCategory\":{\"id\":1}, \"status\":\"PUBLIC\"}";
 
-
         WordSet wordSet = new WordSet(1L, "test", null, null, wordSetCategory, Status.PUBLIC);
 
-
-        when(wordService.createWordSet(wordSet.getTitle(), wordSetCategory.getId(), Status.PUBLIC, principal)).thenReturn(wordSetDTO);
-        mockMvc.perform(post("/common/createWordSet")
+        when(wordSetService.createWordSet(wordSet.getTitle(), wordSetCategory.getId(), Status.PUBLIC, principal)).thenReturn(wordSetDTO);
+        mockMvc.perform(post("/common/wordSet")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent)
                         .accept(MediaType.APPLICATION_JSON))
@@ -264,14 +260,13 @@ public class CommonControllerTest {
     @Test
     void shouldDisplayWordSetByCategory_Test() throws Exception {
         WordSetCategory wordSetCategory = new WordSetCategory(1L, "category");
-        WordSetDTO wordSetDTO = new WordSetDTO();
-        wordSetDTO.setTitle("wordSet");
-        wordSetDTO.setCategory("category");
+        WordSetDTO wordSetDTO = new WordSetDTO(null,"wordSet","category");
+
         List<WordSetDTO> wordSetDTOList = List.of(wordSetDTO);
 
-        when(wordService.findWordSetByCategory(wordSetCategory.getId())).thenReturn(wordSetDTOList);
+        when(wordSetService.findWordSetByCategory(wordSetCategory.getId())).thenReturn(wordSetDTOList);
 
-        mockMvc.perform(get("/common/wordSets/{categoryId}", wordSetCategory.getId())
+        mockMvc.perform(get("/common/wordSets/category{categoryId}", wordSetCategory.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -280,14 +275,13 @@ public class CommonControllerTest {
     @Test
     void shouldDisplayWords_Test() throws Exception {
         Long wordSetId = 1L;
-        WordDTO wordDTO = new WordDTO();
-        wordDTO.setWordNumber(1L);
-        wordDTO.setWord("word");
+        WordDTO wordDTO = new WordDTO(1L,"word");
+
         List<WordDTO> wordDTOList = List.of(wordDTO);
 
         when(wordService.findWordsByWordSetId(wordSetId)).thenReturn(wordDTOList);
 
-        mockMvc.perform(get("/common/words/{wordSetId}", wordSetId)
+        mockMvc.perform(get("/common/wordSet/{wordSetId}/words", wordSetId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].wordNumber").value(1))
@@ -302,9 +296,9 @@ public class CommonControllerTest {
 
         String questionJson = "{ \"id\": 1, \"content\": \"test\", \"answers\": [] }";
 
-        doNothing().when(quizService).addQuestionsToQuiz(quizId, question);
+        doNothing().when(quizQuestionService).addQuestionsToQuiz(quizId, question);
 
-        mockMvc.perform(post("/common/addQuestionsToQuiz/{quizId}", quizId)
+        mockMvc.perform(post("/common/quiz/{quizId}/question", quizId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(questionJson))
                 .andExpect(status().isOk())
@@ -321,7 +315,7 @@ public class CommonControllerTest {
 
         doNothing().when(wordService).addWordToWordSet(wordSetId, word);
 
-        mockMvc.perform(post("/common/addWordToWordSet/{wordSetId}", wordSetId)
+        mockMvc.perform(post("/common/wordSet/{wordSetId}/word", wordSetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(wordJson))
                 .andExpect(status().isOk())

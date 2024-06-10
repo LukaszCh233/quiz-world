@@ -2,7 +2,10 @@ package com.example.quiz_World.entities.wordSetEntity;
 
 import com.example.quiz_World.entities.Status;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 

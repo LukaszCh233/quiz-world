@@ -2,15 +2,15 @@ package com.example.quiz_World.controller;
 
 import ch.qos.logback.classic.Logger;
 import com.example.quiz_World.config.HelpJwt;
+import com.example.quiz_World.dto.AdminDTO;
+import com.example.quiz_World.dto.UserDTO;
 import com.example.quiz_World.entities.Admin;
-import com.example.quiz_World.entities.AdminDTO;
 import com.example.quiz_World.entities.User;
-import com.example.quiz_World.entities.UserDTO;
-import com.example.quiz_World.exceptions.IncorrectPasswordException;
+import com.example.quiz_World.exception.IncorrectPasswordException;
 import com.example.quiz_World.repository.AdminRepository;
 import com.example.quiz_World.repository.UserRepository;
-import com.example.quiz_World.service.AdminServiceImpl;
-import com.example.quiz_World.service.UserServiceImpl;
+import com.example.quiz_World.service.AdminService;
+import com.example.quiz_World.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,15 +26,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 public class AccessController {
     private final Logger logger = (Logger) LoggerFactory.getLogger(AccessController.class);
-    private final AdminServiceImpl adminService;
+    private final AdminService adminService;
     private final AdminRepository adminRepository;
     private final UserRepository userRepository;
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final HelpJwt helpJwt;
 
-    public AccessController(AdminServiceImpl adminService, AdminRepository adminRepository, UserRepository userRepository,
-                            UserServiceImpl userService, PasswordEncoder passwordEncoder, HelpJwt helpJwt) {
+    public AccessController(AdminService adminService, AdminRepository adminRepository, UserRepository userRepository,
+                            UserService userService, PasswordEncoder passwordEncoder, HelpJwt helpJwt) {
         this.adminService = adminService;
         this.adminRepository = adminRepository;
         this.userRepository = userRepository;
@@ -47,7 +47,7 @@ public class AccessController {
     ResponseEntity<UserDTO> registerCustomer(@RequestBody User user) {
         UserDTO createUserDTO = userService.createUser(user);
 
-        logger.info("User registered successfully: {}", createUserDTO.getEmail());
+        logger.info("User registered successfully: {}", createUserDTO.email());
         return new ResponseEntity<>(createUserDTO, HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class AccessController {
 
         AdminDTO createAdmin = adminService.createAdmin(admin);
 
-        logger.info("Admin registered successfully: {}", createAdmin.getEmail());
+        logger.info("Admin registered successfully: {}", createAdmin.email());
         return new ResponseEntity<>(createAdmin, HttpStatus.OK);
     }
 

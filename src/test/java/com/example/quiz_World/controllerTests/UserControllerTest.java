@@ -9,9 +9,12 @@ import com.example.quiz_World.entities.quizEntity.UserAnswer;
 import com.example.quiz_World.entities.wordSetEntity.AnswerToWordSet;
 import com.example.quiz_World.entities.wordSetEntity.Word;
 import com.example.quiz_World.entities.wordSetEntity.WordSet;
-import com.example.quiz_World.service.MapEntity;
-import com.example.quiz_World.service.QuizServiceImpl;
-import com.example.quiz_World.service.WordServiceImpl;
+import com.example.quiz_World.mapper.MapEntity;
+import com.example.quiz_World.service.quiz.QuizQuestionService;
+import com.example.quiz_World.service.quiz.QuizResultService;
+import com.example.quiz_World.service.quiz.QuizService;
+import com.example.quiz_World.service.words.WordSetService;
+import com.example.quiz_World.service.words.WordsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +43,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
 
     @MockBean
-    QuizServiceImpl quizService;
+    QuizService quizService;
     @MockBean
-    WordServiceImpl wordService;
+    QuizQuestionService quizQuestionService;
+    @MockBean
+    QuizResultService quizResultService;
+    @MockBean
+    WordsService wordService;
+    @MockBean
+    WordSetService wordSetService;
     @Autowired
     MapEntity mapEntity;
     @Autowired
@@ -65,7 +74,7 @@ public class UserControllerTest {
 
         doNothing().when(quizService).deleteAllQuizzesForUser(principal);
 
-        mockMvc.perform(delete("/user/deleteQuizzes"))
+        mockMvc.perform(delete("/user/quizzes"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("All quizzes has been deleted"));
     }
@@ -79,7 +88,7 @@ public class UserControllerTest {
 
         doNothing().when(quizService).deleteQuizByIdForUser(quiz.getId(), principal);
 
-        mockMvc.perform(delete("/user/deleteQuiz/{quizId}", quiz.getId()))
+        mockMvc.perform(delete("/user/quiz/{quizId}", quiz.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Quiz has been deleted"));
     }
@@ -94,7 +103,7 @@ public class UserControllerTest {
 
         when(quizService.updateQuizByIdForUser(quiz.getId(), updateQuiz, principal)).thenReturn(updateQuiz);
 
-        mockMvc.perform(put("/user/updateQuiz/{quizId}", 1)
+        mockMvc.perform(put("/user/quiz/{quizId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"updateTest\"}")
                         .accept(MediaType.APPLICATION_JSON))
@@ -107,9 +116,9 @@ public class UserControllerTest {
         Principal principal = mock(Principal.class);
         Long wordSetId = 1L;
 
-        doNothing().when(wordService).deleteWordSetByIdForUser(wordSetId, principal);
+        doNothing().when(wordSetService).deleteWordSetByIdForUser(wordSetId, principal);
 
-        mockMvc.perform(delete("/user/deleteWordSet/{wordSetId}", wordSetId))
+        mockMvc.perform(delete("/user/wordSet/{wordSetId}", wordSetId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Word set has been deleted"));
     }
@@ -119,9 +128,9 @@ public class UserControllerTest {
     void shouldDeleteWordSets_Test() throws Exception {
         Principal principal = mock(Principal.class);
 
-        doNothing().when(wordService).deleteAllWordSetsForUser(principal);
+        doNothing().when(wordSetService).deleteAllWordSetsForUser(principal);
 
-        mockMvc.perform(delete("/user/deleteWordSets"))
+        mockMvc.perform(delete("/user/wordSets"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("All word sets has been deleted"));
     }
@@ -134,9 +143,9 @@ public class UserControllerTest {
         WordSet wordSet = new WordSet(1L, "test", null, null, null, null);
         WordSet updateWordSet = new WordSet(null, "updateTest", null, null, null, null);
 
-        when(wordService.updateWordSetByIdForUser(wordSet.getId(), updateWordSet, principal)).thenReturn(updateWordSet);
+        when(wordSetService.updateWordSetByIdForUser(wordSet.getId(), updateWordSet, principal)).thenReturn(updateWordSet);
 
-        mockMvc.perform(put("/user/updateWordSet/{wordSetId}", 1)
+        mockMvc.perform(put("/user/wordSet/{wordSetId}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"updateTest\"}")
                         .accept(MediaType.APPLICATION_JSON))
@@ -151,9 +160,9 @@ public class UserControllerTest {
         Long quizId = 1L;
         Long questionNumber = 1L;
 
-        doNothing().when(quizService).deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
+        doNothing().when(quizQuestionService).deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
 
-        mockMvc.perform(delete("/user/deleteQuestion/{quizId}/{questionNumber}", quizId, questionNumber))
+        mockMvc.perform(delete("/user/quiz/{quizId}/question/{questionNumber}", quizId, questionNumber))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Question has been deleted"));
     }
@@ -167,9 +176,9 @@ public class UserControllerTest {
         Question question = new Question(1L, 1L, "test", null, null);
         Question updateQuestion = new Question(null, 1L, "updateTest",null , null);
 
-        when(quizService.updateQuestionByQuestionNumberForUser(quizId, question.getQuestionNumber(), updateQuestion, principal)).thenReturn(updateQuestion);
+        when(quizQuestionService.updateQuestionByQuestionNumberForUser(quizId, question.getQuestionNumber(), updateQuestion, principal)).thenReturn(updateQuestion);
 
-        mockMvc.perform(put("/user/updateQuizQuestion/{quizId}/{questionNumber}", quizId, question.getQuestionNumber())
+        mockMvc.perform(put("/user/quiz/{quizId}/question/{questionNumber}", quizId, question.getQuestionNumber())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"updateTest\"}"))
                 .andExpect(status().isOk())
@@ -186,7 +195,7 @@ public class UserControllerTest {
 
         doNothing().when(wordService).deleteWordByNumberWordSetForUser(wordSetId, wordNumber, principal);
 
-        mockMvc.perform(delete("/user/deleteWord/{wordSetId}/{wordNumber}", wordSetId, wordNumber))
+        mockMvc.perform(delete("/user/wordSet/{wordSetId}/word/{wordNumber}", wordSetId, wordNumber))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Word has been deleted"));
     }
@@ -202,7 +211,7 @@ public class UserControllerTest {
 
         when(wordService.updateWordForUser(wordSetId, word.getWordNumber(), wordUpdate, principal)).thenReturn(wordUpdate);
 
-        mockMvc.perform(put("/user/updateWord/{wordSetId}/{wordNumber}", wordSetId, word.getWordNumber())
+        mockMvc.perform(put("/user/wordSet/{wordSetId}/word/{wordNumber}", wordSetId, word.getWordNumber())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"word\":\"updateTest\"}")
                         .content("{\"translation\":\"updateTranslation\"}")
@@ -222,7 +231,7 @@ public class UserControllerTest {
 
         when(quizService.solveQuiz(quizId, userAnswer, principal)).thenReturn(expectedScore);
 
-        mockMvc.perform(post("/user/solveQuiz/{quizId}", quizId)
+        mockMvc.perform(post("/user/quiz-solve/{quizId}", quizId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[{\"answer\":\"1\"}]")
                         .accept(MediaType.APPLICATION_JSON))
@@ -238,7 +247,7 @@ public class UserControllerTest {
         Quiz quiz = new Quiz(1L, null, null, null, null, null);
         List<Result> results = List.of(new Result(1L, user, quiz, null, 100.0));
 
-        when(quizService.findYourQuizzesResults(principal)).thenReturn(mapEntity.mapQuizResultsToQuizResultsDTO(results));
+        when(quizResultService.findYourQuizzesResults(principal)).thenReturn(mapEntity.mapQuizResultsToQuizResultsDTO(results));
 
         mockMvc.perform(get("/user/quiz/score"))
                 .andExpect(status().isOk());
@@ -253,9 +262,9 @@ public class UserControllerTest {
         List<AnswerToWordSet> answers = List.of(new AnswerToWordSet("translation"));
         double expectedScore = 100.0;
 
-        when(wordService.solveWordSet(wordSetId, answers, principal)).thenReturn(expectedScore);
+        when(wordSetService.solveWordSet(wordSetId, answers, principal)).thenReturn(expectedScore);
 
-        mockMvc.perform(post("/user/solveWordSet/{wordSetId}", wordSetId)
+        mockMvc.perform(post("/user/wordSet-solve/{wordSetId}", wordSetId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("[{\"answer\":\"translation\"}]")
                         .accept(MediaType.APPLICATION_JSON))

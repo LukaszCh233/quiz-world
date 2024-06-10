@@ -1,15 +1,18 @@
 package com.example.quiz_World.controller;
 
-import com.example.quiz_World.entities.QuizResultDTO;
-import com.example.quiz_World.entities.WordSetResultDTO;
+import com.example.quiz_World.dto.QuizResultDTO;
+import com.example.quiz_World.dto.WordSetResultDTO;
 import com.example.quiz_World.entities.quizEntity.Question;
 import com.example.quiz_World.entities.quizEntity.Quiz;
 import com.example.quiz_World.entities.quizEntity.UserAnswer;
 import com.example.quiz_World.entities.wordSetEntity.AnswerToWordSet;
 import com.example.quiz_World.entities.wordSetEntity.Word;
 import com.example.quiz_World.entities.wordSetEntity.WordSet;
-import com.example.quiz_World.service.QuizServiceImpl;
-import com.example.quiz_World.service.WordServiceImpl;
+import com.example.quiz_World.service.quiz.QuizQuestionService;
+import com.example.quiz_World.service.quiz.QuizResultService;
+import com.example.quiz_World.service.quiz.QuizService;
+import com.example.quiz_World.service.words.WordSetService;
+import com.example.quiz_World.service.words.WordsService;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,12 +24,21 @@ import java.util.List;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-    private final QuizServiceImpl quizService;
-    private final WordServiceImpl wordService;
+    private final QuizService quizService;
+    private final WordsService wordService;
+    private final QuizQuestionService quizQuestionService;
+    private final QuizResultService quizResultService;
+    private final WordSetService wordSetService;
 
-    public UserController(QuizServiceImpl quizService, WordServiceImpl wordService) {
+
+    public UserController(QuizService quizService, WordsService wordService,
+                          QuizQuestionService quizQuestionService, QuizResultService quizResultService,
+                          WordSetService wordSetService) {
         this.quizService = quizService;
         this.wordService = wordService;
+        this.quizQuestionService = quizQuestionService;
+        this.quizResultService = quizResultService;
+        this.wordSetService = wordSetService;
     }
 
     @DeleteMapping("/quizzes")
@@ -38,7 +50,7 @@ public class UserController {
 
     @DeleteMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, Principal principal) {
-        quizService.deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
+        quizQuestionService.deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
 
         return ResponseEntity.ok("Question has been deleted");
     }
@@ -59,7 +71,7 @@ public class UserController {
 
     @PutMapping("/quiz/{quizId}/question/{questionNumber}")
     public ResponseEntity<?> updateYourQuizQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question questions, Principal principal) {
-        quizService.updateQuestionByQuestionNumberForUser(quizId, questionNumber, questions, principal);
+        quizQuestionService.updateQuestionByQuestionNumberForUser(quizId, questionNumber, questions, principal);
 
         return ResponseEntity.ok("Question updated");
     }
@@ -73,16 +85,18 @@ public class UserController {
 
     @GetMapping("/quiz/score")
     public ResponseEntity<List<QuizResultDTO>> displayYourQuizzesScore(Principal principal) {
-        List<QuizResultDTO> quizResultDTOS = quizService.findYourQuizzesResults(principal);
+        List<QuizResultDTO> quizResultDTOS = quizResultService.findYourQuizzesResults(principal);
 
         return ResponseEntity.ok(quizResultDTOS);
     }
+
     @GetMapping("/quiz/globalScore")
     public ResponseEntity<List<QuizResultDTO>> displayQuizzesScore() {
-        List<QuizResultDTO> quizResultDTOS = quizService.findQuizzesResults();
+        List<QuizResultDTO> quizResultDTOS = quizResultService.findQuizzesResults();
 
         return ResponseEntity.ok(quizResultDTOS);
     }
+
     @GetMapping("/words/score")
     public ResponseEntity<List<WordSetResultDTO>> displayYourWordSetsScore(Principal principal) {
         List<WordSetResultDTO> wordSetResultDTOS = wordService.findYourWordsResults(principal);
@@ -92,7 +106,7 @@ public class UserController {
 
     @PostMapping("/wordSet-solve/{wordSetId}")
     public ResponseEntity<?> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
-        double score = wordService.solveWordSet(wordSetId, userAnswers, principal);
+        double score = wordSetService.solveWordSet(wordSetId, userAnswers, principal);
 
         return ResponseEntity.ok("Your score: " + score);
     }
@@ -100,14 +114,14 @@ public class UserController {
     @Transactional
     @DeleteMapping("/wordSets")
     public ResponseEntity<?> deleteAllWordSet(Principal principal) {
-        wordService.deleteAllWordSetsForUser(principal);
+        wordSetService.deleteAllWordSetsForUser(principal);
 
         return ResponseEntity.ok("All word sets has been deleted");
     }
 
     @DeleteMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId, Principal principal) {
-        wordService.deleteWordSetByIdForUser(wordSetId, principal);
+        wordSetService.deleteWordSetByIdForUser(wordSetId, principal);
 
         return ResponseEntity.ok("Word set has been deleted");
     }
@@ -121,7 +135,7 @@ public class UserController {
 
     @PutMapping("/wordSet/{wordSetId}")
     public ResponseEntity<?> updateYourWordSet(@PathVariable Long wordSetId, @RequestBody WordSet wordSet, Principal principal) {
-        wordService.updateWordSetByIdForUser(wordSetId, wordSet, principal);
+        wordSetService.updateWordSetByIdForUser(wordSetId, wordSet, principal);
 
         return ResponseEntity.ok("Word set updated");
     }
