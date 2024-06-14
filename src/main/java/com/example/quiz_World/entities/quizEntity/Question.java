@@ -1,6 +1,8 @@
 package com.example.quiz_World.entities.quizEntity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +20,9 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull(message = "Question number must be provided")
     private Long questionNumber;
+    @NotBlank(message = "Content must not be blank")
     private String content;
     @ManyToOne
     @JoinColumn(name = "quiz_id")

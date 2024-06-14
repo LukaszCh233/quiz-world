@@ -16,6 +16,7 @@ import com.example.quiz_World.service.quiz.QuizQuestionService;
 import com.example.quiz_World.service.quiz.QuizService;
 import com.example.quiz_World.service.words.WordSetService;
 import com.example.quiz_World.service.words.WordsService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -73,28 +74,28 @@ public class AdminController {
     }
 
     @PostMapping("/quiz-category")
-    public ResponseEntity<QuizCategory> createQuizCategory(@RequestBody QuizCategory quizCategory) {
+    public ResponseEntity<QuizCategory> createQuizCategory(@Valid @RequestBody QuizCategory quizCategory) {
         QuizCategory createQuizCategory = quizCategoryService.createQuizCategory(quizCategory);
 
         return ResponseEntity.ok(createQuizCategory);
     }
 
     @PostMapping("/wordSet-category")
-    public ResponseEntity<WordSetCategory> createWordSetCategory(@RequestBody WordSetCategory wordSetCategory) {
+    public ResponseEntity<WordSetCategory> createWordSetCategory(@Valid @RequestBody WordSetCategory wordSetCategory) {
         WordSetCategory createWordSetCategory = wordSetCategoryService.createWordSetCategory(wordSetCategory);
 
         return ResponseEntity.ok(createWordSetCategory);
     }
 
     @PutMapping("/quiz/{quizId}")
-    public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @RequestBody Quiz quiz) {
+    public ResponseEntity<?> updateQuiz(@PathVariable Long quizId, @Valid @RequestBody Quiz quiz) {
         quizService.updateQuizByIdForAdmin(quizId, quiz);
 
         return ResponseEntity.ok("Quiz updated");
     }
 
     @PutMapping("/quiz/{quizId}/question/{questionNumber}")
-    public ResponseEntity<?> updateQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question question) {
+    public ResponseEntity<?> updateQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber, @Valid @RequestBody Question question) {
         quizQuestionService.updateQuestionByQuestionNumberForAdmin(quizId, questionNumber, question);
 
         return ResponseEntity.ok("Question updated");
@@ -119,13 +120,13 @@ public class AdminController {
     }
 
     @PutMapping("/wordSet/{wordSetId}")
-    public ResponseEntity<?> updateWordSet(@PathVariable Long wordSetId, @RequestBody WordSet wordSet) {
+    public ResponseEntity<?> updateWordSet(@PathVariable Long wordSetId, @Valid @RequestBody WordSet wordSet) {
         wordSetService.updateWordSetByIdForAdmin(wordSetId, wordSet);
         return ResponseEntity.ok("Word set updated");
     }
 
     @PutMapping("/wordSet/{wordSetId}/word/{wordNumber}")
-    public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, @RequestBody Word word) {
+    public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, @Valid @RequestBody Word word) {
         wordService.updateWordForAdmin(wordSetId, wordNumber, word);
         return ResponseEntity.ok("Word updated");
     }
@@ -161,13 +162,13 @@ public class AdminController {
     }
 
     @PutMapping("/wordSet-category/{categoryId}")
-    public ResponseEntity<?> updateWordSetCategory(@PathVariable Long categoryId, @RequestBody WordSetCategory wordSetCategory) {
+    public ResponseEntity<?> updateWordSetCategory(@PathVariable Long categoryId, @Valid @RequestBody WordSetCategory wordSetCategory) {
         WordSetCategory updateCategory = wordSetCategoryService.updateWordSetCategory(categoryId, wordSetCategory);
         return ResponseEntity.ok(updateCategory);
     }
 
     @PutMapping("/quiz-category/{categoryId}")
-    public ResponseEntity<?> updateQuizCategory(@PathVariable Long categoryId, @RequestBody QuizCategory quizCategory) {
+    public ResponseEntity<?> updateQuizCategory(@PathVariable Long categoryId, @Valid @RequestBody QuizCategory quizCategory) {
         QuizCategory updateCategory = quizCategoryService.updateQuizCategory(categoryId, quizCategory);
         return ResponseEntity.ok(updateCategory);
     }

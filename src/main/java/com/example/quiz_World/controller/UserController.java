@@ -14,6 +14,7 @@ import com.example.quiz_World.service.quiz.QuizService;
 import com.example.quiz_World.service.words.WordSetService;
 import com.example.quiz_World.service.words.WordsService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -63,21 +64,21 @@ public class UserController {
     }
 
     @PutMapping("/quiz/{quizId}")
-    public ResponseEntity<?> updateYourQuiz(@PathVariable Long quizId, @RequestBody Quiz quiz, Principal principal) {
+    public ResponseEntity<?> updateYourQuiz(@PathVariable Long quizId, @Valid @RequestBody Quiz quiz, Principal principal) {
         quizService.updateQuizByIdForUser(quizId, quiz, principal);
 
         return ResponseEntity.ok("Quiz updated");
     }
 
     @PutMapping("/quiz/{quizId}/question/{questionNumber}")
-    public ResponseEntity<?> updateYourQuizQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, @RequestBody Question questions, Principal principal) {
+    public ResponseEntity<?> updateYourQuizQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, @Valid @RequestBody Question questions, Principal principal) {
         quizQuestionService.updateQuestionByQuestionNumberForUser(quizId, questionNumber, questions, principal);
 
         return ResponseEntity.ok("Question updated");
     }
 
     @PostMapping("/quiz-solve/{quizId}")
-    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
+    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId,@RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
         double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
 
         return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
@@ -134,14 +135,14 @@ public class UserController {
     }
 
     @PutMapping("/wordSet/{wordSetId}")
-    public ResponseEntity<?> updateYourWordSet(@PathVariable Long wordSetId, @RequestBody WordSet wordSet, Principal principal) {
+    public ResponseEntity<?> updateYourWordSet(@PathVariable Long wordSetId, @Valid @RequestBody WordSet wordSet, Principal principal) {
         wordSetService.updateWordSetByIdForUser(wordSetId, wordSet, principal);
 
         return ResponseEntity.ok("Word set updated");
     }
 
     @PutMapping("/wordSet/{wordSetId}/word/{wordNumber}")
-    public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @RequestBody Word word, @PathVariable Long wordNumber, Principal principal) {
+    public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @Valid @RequestBody Word word, @PathVariable Long wordNumber, Principal principal) {
         wordService.updateWordForUser(wordSetId, wordNumber, word, principal);
 
         return ResponseEntity.ok("Word updated");

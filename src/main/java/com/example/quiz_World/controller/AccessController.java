@@ -12,6 +12,7 @@ import com.example.quiz_World.repository.UserRepository;
 import com.example.quiz_World.service.AdminService;
 import com.example.quiz_World.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class AccessController {
     }
 
     @PostMapping("/userReg")
-    ResponseEntity<UserDTO> registerCustomer(@RequestBody User user) {
+    ResponseEntity<UserDTO> registerCustomer(@Valid @RequestBody User user) {
         UserDTO createUserDTO = userService.createUser(user);
 
         logger.info("User registered successfully: {}", createUserDTO.email());
@@ -52,7 +53,7 @@ public class AccessController {
     }
 
     @PostMapping("/userLog")
-    ResponseEntity<?> loginCustomer(@RequestBody User user) {
+    ResponseEntity<?> loginCustomer(@Valid @RequestBody User user) {
         User registeredUser = userRepository.findByEmail(user.getEmail()).orElseThrow(()
                 -> new EntityNotFoundException("User not exists"));
 
@@ -65,7 +66,7 @@ public class AccessController {
     }
 
     @PostMapping("/adminReg")
-    ResponseEntity<AdminDTO> registerAdmin(@RequestBody Admin admin) {
+    ResponseEntity<AdminDTO> registerAdmin(@Valid @RequestBody Admin admin) {
 
         AdminDTO createAdmin = adminService.createAdmin(admin);
 
@@ -74,7 +75,7 @@ public class AccessController {
     }
 
     @PostMapping("/adminLog")
-    ResponseEntity<?> loginAdmin(@RequestBody Admin admin) {
+    ResponseEntity<?> loginAdmin(@Valid @RequestBody Admin admin) {
 
         Admin registeredAdmin = adminRepository.findByEmail(admin.getEmail()).orElseThrow(()
                 -> new EntityNotFoundException("Admin not exists"));

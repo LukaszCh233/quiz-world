@@ -11,6 +11,7 @@ import com.example.quiz_World.service.quiz.QuizQuestionService;
 import com.example.quiz_World.service.quiz.QuizService;
 import com.example.quiz_World.service.words.WordSetService;
 import com.example.quiz_World.service.words.WordsService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -61,14 +62,14 @@ public class CommonController {
     }
 
     @PostMapping("/quiz")
-    public ResponseEntity<QuizDTO> createQuiz(@RequestBody Quiz quiz, Principal principal) {
+    public ResponseEntity<QuizDTO> createQuiz(@Valid @RequestBody Quiz quiz, Principal principal) {
         QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory().getId(), quiz.getStatus(), principal);
 
         return ResponseEntity.ok(createQuiz);
     }
 
     @PostMapping("/quiz/{quizId}/question")
-    public ResponseEntity<?> addQuestionToQuiz(@PathVariable Long quizId, @RequestBody Question question) {
+    public ResponseEntity<?> addQuestionToQuiz(@PathVariable Long quizId, @Valid @RequestBody Question question) {
         quizQuestionService.addQuestionsToQuiz(quizId, question);
 
         return ResponseEntity.ok("Question added to quiz successfully");
@@ -110,14 +111,14 @@ public class CommonController {
     }
 
     @PostMapping("/wordSet")
-    public ResponseEntity<WordSetDTO> createWordSet(@RequestBody WordSet wordSet, Principal principal) {
+    public ResponseEntity<WordSetDTO> createWordSet(@Valid @RequestBody WordSet wordSet, Principal principal) {
         WordSetDTO createWordSet = wordSetService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory().getId(), wordSet.getStatus(), principal);
 
         return ResponseEntity.ok(createWordSet);
     }
 
     @PostMapping("/wordSet/{wordSetId}/word")
-    public ResponseEntity<?> addWordToWordSet(@PathVariable Long wordSetId, @RequestBody Word word) {
+    public ResponseEntity<?> addWordToWordSet(@PathVariable Long wordSetId, @Valid @RequestBody Word word) {
         wordService.addWordToWordSet(wordSetId, word);
 
         return ResponseEntity.ok("Word added to word set successfully");
