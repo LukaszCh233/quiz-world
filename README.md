@@ -1,4 +1,4 @@
-# quiz_World 
+# quiz_world 
 Quiz World it's My project in Java and Spring Boot where We have two moduls.
 Application provide two options for Admin and for User.
 Admin who can manage the application and User who uses the application.
