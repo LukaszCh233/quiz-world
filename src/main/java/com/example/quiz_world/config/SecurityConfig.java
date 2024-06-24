@@ -1,6 +1,6 @@
 package com.example.quiz_world.config;
 
-import com.example.quiz_world.entities.Role;
+import com.example.quiz_world.user.entity.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/user/**").hasAnyRole(Role.USER.name())
                         .requestMatchers("/admin/**").hasAnyRole(Role.ADMIN.name())
+                        .requestMatchers("/common/**").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                         .requestMatchers("/access/**")
                         .permitAll()
                         .anyRequest().authenticated())

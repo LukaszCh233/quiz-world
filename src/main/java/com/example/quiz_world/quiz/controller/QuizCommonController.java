@@ -1,0 +1,88 @@
+package com.example.quiz_world.quiz.controller;
+
+import com.example.quiz_world.quiz.dto.QuestionDTO;
+import com.example.quiz_world.quiz.dto.QuizCategoryDTO;
+import com.example.quiz_world.quiz.dto.QuizDTO;
+import com.example.quiz_world.quiz.entity.Question;
+import com.example.quiz_world.quiz.entity.Quiz;
+import com.example.quiz_world.quiz.service.QuizCategoryService;
+import com.example.quiz_world.quiz.service.QuizQuestionService;
+import com.example.quiz_world.quiz.service.QuizService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
+
+@Controller
+@RequestMapping("/common")
+public class QuizCommonController {
+    private final QuizService quizService;
+    private final QuizCategoryService quizCategoryService;
+    private final QuizQuestionService quizQuestionService;
+
+    public QuizCommonController(QuizService quizService, QuizQuestionService quizQuestionService,
+                                QuizCategoryService quizCategoryService) {
+        this.quizService = quizService;
+        this.quizQuestionService = quizQuestionService;
+        this.quizCategoryService = quizCategoryService;
+    }
+
+    @GetMapping("/quizzes")
+    public ResponseEntity<?> displayQuizzes() {
+        List<QuizDTO> quizzes = quizService.findAllPublicQuizzes();
+
+        return ResponseEntity.ok(quizzes);
+    }
+
+    @GetMapping("/quiz/{id}")
+    public ResponseEntity<?> displayQuiz(@PathVariable Long id) {
+        QuizDTO quizDTO = quizService.findQuizById(id);
+
+        return ResponseEntity.ok(quizDTO);
+    }
+
+    @GetMapping("/quiz/{quizId}/questions")
+    public ResponseEntity<?> displayQuestions(@PathVariable Long quizId) {
+        List<QuestionDTO> questions = quizQuestionService.findQuestionsByQuizId(quizId);
+
+        return ResponseEntity.ok(questions);
+    }
+
+    @PostMapping("/quiz")
+    public ResponseEntity<QuizDTO> createQuiz(@Valid @RequestBody Quiz quiz, Principal principal) {
+        QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory().getId(), quiz.getStatus(), principal);
+
+        return ResponseEntity.ok(createQuiz);
+    }
+
+    @PostMapping("/quiz/{quizId}/question")
+    public ResponseEntity<?> addQuestionToQuiz(@PathVariable Long quizId, @Valid @RequestBody Question question) {
+        quizQuestionService.addQuestionsToQuiz(quizId, question);
+
+        return ResponseEntity.ok("Question added to quiz successfully");
+    }
+
+    @GetMapping("/user-quizzes")
+    public ResponseEntity<?> displayYourQuizzes(Principal principal) {
+        List<QuizDTO> quizzes = quizService.findYourQuizzes(principal);
+
+        return ResponseEntity.ok(quizzes);
+    }
+
+    @GetMapping("/quizzes/category/{categoryId}")
+    public ResponseEntity<List<QuizDTO>> displayQuizzesByCategory(@PathVariable Long categoryId) {
+        List<QuizDTO> quizDTOList = quizService.findQuizByCategory(categoryId);
+
+        return ResponseEntity.ok(quizDTOList);
+    }
+
+    @GetMapping("/quizCategories")
+    public ResponseEntity<List<QuizCategoryDTO>> displayQuizCategories() {
+        List<QuizCategoryDTO> quizCategoryDTOList = quizCategoryService.findAllQuizCategories();
+
+        return ResponseEntity.ok(quizCategoryDTOList);
+    }
+}
