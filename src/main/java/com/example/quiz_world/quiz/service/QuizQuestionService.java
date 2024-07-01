@@ -5,7 +5,7 @@ import com.example.quiz_world.quiz.dto.QuestionDTO;
 import com.example.quiz_world.quiz.entity.AnswerToQuiz;
 import com.example.quiz_world.quiz.entity.Question;
 import com.example.quiz_world.quiz.entity.Quiz;
-import com.example.quiz_world.quiz.repository.QuestionRepository;
+import com.example.quiz_world.quiz.repository.QuizQuestionRepository;
 import com.example.quiz_world.quiz.repository.QuizRepository;
 import com.example.quiz_world.user.entity.Status;
 import com.example.quiz_world.user.entity.User;
@@ -20,14 +20,14 @@ import java.util.List;
 public class QuizQuestionService {
     private final QuizRepository quizRepository;
     private final UserRepository userRepository;
-    private final QuestionRepository questionRepository;
+    private final QuizQuestionRepository quizQuestionRepository;
     private final MapperEntity mapperEntity;
 
     public QuizQuestionService(QuizRepository quizRepository, UserRepository userRepository,
-                               QuestionRepository questionRepository, MapperEntity mapperEntity) {
+                               QuizQuestionRepository quizQuestionRepository, MapperEntity mapperEntity) {
         this.quizRepository = quizRepository;
         this.userRepository = userRepository;
-        this.questionRepository = questionRepository;
+        this.quizQuestionRepository = quizQuestionRepository;
         this.mapperEntity = mapperEntity;
     }
 
@@ -61,9 +61,9 @@ public class QuizQuestionService {
         if (!quiz.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
-        Question question = questionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
+        Question question = quizQuestionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
 
-        questionRepository.delete(question);
+        quizQuestionRepository.delete(question);
     }
 
     public Question updateQuestionByQuestionNumberForUser(Long quizId, Long questionNumber, Question
@@ -76,7 +76,7 @@ public class QuizQuestionService {
         if (!quiz.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
-        Question questionToUpdate = questionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
+        Question questionToUpdate = quizQuestionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         questionToUpdate.setContent(question.getContent());
 
@@ -86,11 +86,11 @@ public class QuizQuestionService {
             answerToQuiz.setQuestion(questionToUpdate);
             questionToUpdate.getAnswerToQuiz().add(answerToQuiz);
         }
-        return questionRepository.save(questionToUpdate);
+        return quizQuestionRepository.save(questionToUpdate);
     }
 
     public Question updateQuestionByQuestionNumberForAdmin(Long quizId, Long questionNumber, Question question) {
-        Question questionToUpdate = questionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
+        Question questionToUpdate = quizQuestionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         questionToUpdate.setContent(question.getContent());
 
@@ -100,12 +100,12 @@ public class QuizQuestionService {
             answerToQuiz.setQuestion(questionToUpdate);
             questionToUpdate.getAnswerToQuiz().add(answerToQuiz);
         }
-        return questionRepository.save(questionToUpdate);
+        return quizQuestionRepository.save(questionToUpdate);
     }
 
     public void deleteQuestionByNumberQuestionForAdmin(Long quizId, Long numberQuestion) {
-        Question question = questionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
+        Question question = quizQuestionRepository.findByQuizIdAndQuestionNumber(quizId, numberQuestion).orElseThrow(() -> new EntityNotFoundException("Question not found"));
 
-        questionRepository.delete(question);
+        quizQuestionRepository.delete(question);
     }
 }

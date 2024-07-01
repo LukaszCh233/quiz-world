@@ -1,5 +1,6 @@
 package com.example.quiz_world.words.service;
 
+import com.example.quiz_world.exception.ExistsException;
 import com.example.quiz_world.mapper.MapperEntity;
 import com.example.quiz_world.words.dto.WordSetCategoryDTO;
 import com.example.quiz_world.words.entity.WordSetCategory;
@@ -9,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class WordSetCategoryService {
@@ -20,8 +22,12 @@ public class WordSetCategoryService {
         this.mapperEntity = mapperEntity;
     }
 
-    public WordSetCategory createWordSetCategory(WordSetCategory categoryWordSet) {
-        return wordSetCategoryRepository.save(categoryWordSet);
+    public WordSetCategory createWordSetCategory(WordSetCategory wordSetCategory) {
+        Optional<WordSetCategory> existingCategory = wordSetCategoryRepository.findByNameIgnoreCase(wordSetCategory.getName());
+        if (existingCategory.isPresent()) {
+            throw new ExistsException("Category exists");
+        }
+        return wordSetCategoryRepository.save(wordSetCategory);
     }
 
     public List<WordSetCategoryDTO> findAllWordSetCategories() {
