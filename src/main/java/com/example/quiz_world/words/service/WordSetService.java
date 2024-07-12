@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,8 +49,6 @@ public class WordSetService {
         Result prviousResult = resultRepository.findByUserIdAndWordSetId(user.getId(), wordSetId);
 
         List<Word> words = new ArrayList<>(wordSet.getWords());
-
-        Collections.shuffle(words);
 
         int point = 0;
 
@@ -171,7 +168,7 @@ public class WordSetService {
         wordSetRepository.delete(wordSet);
     }
 
-    public WordSet updateWordSetByIdForUser(Long id, WordSet wordSet, Principal principal) {
+    public void updateWordSetByIdForUser(Long id, WordSet wordSet, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -188,10 +185,10 @@ public class WordSetService {
         wordSetToUpdate.setWordSetCategory(wordSetCategory);
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
-        return wordSetRepository.save(wordSetToUpdate);
+         wordSetRepository.save(wordSetToUpdate);
     }
 
-    public WordSet updateWordSetByIdForAdmin(Long id, WordSet wordSet) {
+    public void updateWordSetByIdForAdmin(Long id, WordSet wordSet) {
         WordSet wordSetToUpdate = wordSetRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
 
         if (wordSet.getWordSetCategory() == null) {
@@ -203,7 +200,7 @@ public class WordSetService {
         wordSetToUpdate.setWordSetCategory(wordSetCategory);
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
-        return wordSetRepository.save(wordSetToUpdate);
+         wordSetRepository.save(wordSetToUpdate);
     }
 
     @Transactional

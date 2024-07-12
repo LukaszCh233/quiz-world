@@ -72,7 +72,7 @@ public class WordsService {
         wordRepository.delete(word);
     }
 
-    public Word updateWordForUser(Long wordSetId, Long wordNumber, Word word, Principal principal) {
+    public void updateWordForUser(Long wordSetId, Long wordNumber, Word word, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -85,7 +85,7 @@ public class WordsService {
         wordToUpdate.setWord(word.getWord());
         wordToUpdate.setTranslation(word.getTranslation());
 
-        return wordRepository.save(wordToUpdate);
+         wordRepository.save(wordToUpdate);
     }
 
     public List<WordSetResultDTO> findYourWordsResults(Principal principal) {
@@ -99,7 +99,7 @@ public class WordsService {
         return mapperEntity.mapWordSetResultsToWordSetResultsDTO(results);
     }
 
-    public Word updateWordForAdmin(Long wordSetId, Long wordNumber, Word word) {
+    public void updateWordForAdmin(Long wordSetId, Long wordNumber, Word word) {
         WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Word set not found"));
 
         Word wordToUpdate = wordRepository.findByWordSetIdAndWordNumber(wordSet.getId(), wordNumber).orElseThrow(() -> new EntityNotFoundException("Not found word"));
@@ -107,7 +107,7 @@ public class WordsService {
         wordToUpdate.setWord(word.getWord());
         wordToUpdate.setTranslation(word.getTranslation());
 
-        return wordRepository.save(wordToUpdate);
+         wordRepository.save(wordToUpdate);
     }
 
     public void deleteWordByNumberWordSetForAdmin(Long wordSetId, Long numberWord) {

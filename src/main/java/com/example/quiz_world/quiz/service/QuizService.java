@@ -114,7 +114,7 @@ public class QuizService {
         quizRepository.delete(quizToDelete);
     }
 
-    public Quiz updateQuizByIdForUser(Long id, Quiz quiz, Principal principal) {
+    public void updateQuizByIdForUser(Long id, Quiz quiz, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
@@ -131,10 +131,10 @@ public class QuizService {
         quizToUpdate.setQuizCategory(quizCategory);
         quizToUpdate.setStatus(quiz.getStatus());
 
-        return quizRepository.save(quizToUpdate);
+         quizRepository.save(quizToUpdate);
     }
 
-    public Quiz updateQuizByIdForAdmin(Long id, Quiz quiz) {
+    public void updateQuizByIdForAdmin(Long id, Quiz quiz) {
         Quiz quizToUpdate = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
         if (quiz.getQuizCategory() == null) {
@@ -146,7 +146,7 @@ public class QuizService {
         quizToUpdate.setQuizCategory(quizCategory);
         quizToUpdate.setStatus(quiz.getStatus());
 
-        return quizRepository.save(quizToUpdate);
+         quizRepository.save(quizToUpdate);
     }
 
     public List<Quiz> findQuizzesByUserPrincipal(Principal principal) {

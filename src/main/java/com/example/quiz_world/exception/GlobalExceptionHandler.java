@@ -21,21 +21,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(ExistsException.class)
+    @ExceptionHandler({ExistsException.class, IncorrectPasswordException.class, UnauthorizedOperationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<String> handleExistsException(ExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-    }
+    public ResponseEntity<String> handleConflictExceptions(RuntimeException e) {
 
-    @ExceptionHandler(IncorrectPasswordException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<String> handleExistsException(IncorrectPasswordException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-    }
-
-    @ExceptionHandler(UnauthorizedOperationException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<String> handleExistsException(UnauthorizedOperationException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
