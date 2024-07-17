@@ -1,9 +1,12 @@
 package com.example.quiz_world.user.service;
 
+import com.example.quiz_world.config.HelpJwt;
 import com.example.quiz_world.exception.ExistsException;
+import com.example.quiz_world.exception.IncorrectPasswordException;
 import com.example.quiz_world.mapper.MapperEntity;
 import com.example.quiz_world.user.dto.AdminDTO;
 import com.example.quiz_world.user.dto.UserDTO;
+import com.example.quiz_world.user.entity.LoginRequest;
 import com.example.quiz_world.user.entity.Role;
 import com.example.quiz_world.user.entity.User;
 import com.example.quiz_world.user.repository.UserRepository;
@@ -18,11 +21,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MapperEntity mapperEntity;
+    private final HelpJwt helpJwt;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MapperEntity mapperEntity) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MapperEntity mapperEntity,
+                       HelpJwt helpJwt) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapperEntity = mapperEntity;
+        this.helpJwt = helpJwt;
     }
 
     public UserDTO createUser(User user) {
@@ -46,6 +52,26 @@ public class UserService {
         user.setPassword(encodedPassword);
 
         return mapperEntity.mapAdminToAdminDTO(userRepository.save(user));
+    }
+
+    public String userAuthorization(LoginRequest loginRequest) {
+        User registeredUser = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(()
+                -> new EntityNotFoundException("User not exists"));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), registeredUser.getPassword())) {
+            throw new IncorrectPasswordException("Incorrect email or password");
+        }
+        return helpJwt.generateToken(registeredUser);
+    }
+
+    public String adminAuthorization(LoginRequest loginRequest) {
+        User registeredAdmin = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(()
+                -> new EntityNotFoundException("Admin not exists"));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), registeredAdmin.getPassword())) {
+            throw new IncorrectPasswordException("Incorrect email or password");
+        }
+        return helpJwt.generateToken(registeredAdmin);
     }
 
     public List<UserDTO> findAllUsers() {
