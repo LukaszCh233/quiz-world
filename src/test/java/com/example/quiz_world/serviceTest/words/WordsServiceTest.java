@@ -1,8 +1,8 @@
-package com.example.quiz_world.serviceTest.quiz.words.words.words;
+package com.example.quiz_world.serviceTest.words;
 
 import com.example.quiz_world.reslult.Result;
 import com.example.quiz_world.reslult.ResultRepository;
-import com.example.quiz_world.serviceTest.quiz.words.words.TestPrincipal;
+import com.example.quiz_world.serviceTest.TestPrincipal;
 import com.example.quiz_world.user.entity.Role;
 import com.example.quiz_world.user.entity.Status;
 import com.example.quiz_world.user.entity.User;

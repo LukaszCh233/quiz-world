@@ -1,4 +1,4 @@
-package com.example.quiz_world.serviceTest.quiz.words.words;
+package com.example.quiz_world.serviceTest;
 
 import java.security.Principal;
 
