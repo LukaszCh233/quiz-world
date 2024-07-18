@@ -23,7 +23,6 @@ public class AdminWordsController {
         this.wordSetCategoryService = wordSetCategoryService;
         this.wordService = wordService;
         this.wordSetService = wordSetService;
-
     }
 
     @PostMapping("/wordSet-category")

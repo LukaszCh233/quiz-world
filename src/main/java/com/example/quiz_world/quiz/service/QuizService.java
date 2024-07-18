@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class QuizService {
@@ -84,7 +85,11 @@ public class QuizService {
         if (quizList.isEmpty()) {
             throw new EntityNotFoundException("Not found quiz with this category");
         }
-        return mapperEntity.mapQuizzesToQuizzesDTO(quizList);
+        List<Quiz> publicQuizzes = quizList.stream()
+                .filter(quiz -> quiz.getStatus().equals(Status.PUBLIC))
+                .collect(Collectors.toList());
+
+        return mapperEntity.mapQuizzesToQuizzesDTO(publicQuizzes);
     }
 
     @Transactional
@@ -105,7 +110,7 @@ public class QuizService {
         String username = principal.getName();
         User user = userRepository.findByEmail(username).orElseThrow(() -> new EntityNotFoundException("Not found user"));
 
-        Quiz quizToDelete = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz nor found"));
+        Quiz quizToDelete = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
         if (!quizToDelete.getUserId().equals(user.getId())) {
             throw new UnsupportedOperationException("User is not authorized to delete this quiz");
         }
@@ -120,7 +125,7 @@ public class QuizService {
 
         Quiz quizToUpdate = quizRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
         if (!quizToUpdate.getUserId().equals(user.getId())) {
-            throw new UnsupportedOperationException("User is not authorized to delete this quiz");
+            throw new UnsupportedOperationException("User is not authorized to update this quiz");
         }
         if (quiz.getQuizCategory() == null) {
             throw new IllegalArgumentException("Quiz category cannot be null");
@@ -131,7 +136,7 @@ public class QuizService {
         quizToUpdate.setQuizCategory(quizCategory);
         quizToUpdate.setStatus(quiz.getStatus());
 
-         quizRepository.save(quizToUpdate);
+        quizRepository.save(quizToUpdate);
     }
 
     public void updateQuizByIdForAdmin(Long id, Quiz quiz) {
@@ -146,7 +151,7 @@ public class QuizService {
         quizToUpdate.setQuizCategory(quizCategory);
         quizToUpdate.setStatus(quiz.getStatus());
 
-         quizRepository.save(quizToUpdate);
+        quizRepository.save(quizToUpdate);
     }
 
     public List<Quiz> findQuizzesByUserPrincipal(Principal principal) {

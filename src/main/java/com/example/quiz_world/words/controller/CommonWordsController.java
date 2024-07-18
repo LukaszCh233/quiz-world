@@ -3,6 +3,8 @@ package com.example.quiz_world.words.controller;
 import com.example.quiz_world.words.dto.WordDTO;
 import com.example.quiz_world.words.dto.WordSetCategoryDTO;
 import com.example.quiz_world.words.dto.WordSetDTO;
+import com.example.quiz_world.words.dto.WordSetResultDTO;
+import com.example.quiz_world.words.entity.AnswerToWordSet;
 import com.example.quiz_world.words.entity.Word;
 import com.example.quiz_world.words.entity.WordSet;
 import com.example.quiz_world.words.service.WordSetCategoryService;
@@ -85,5 +87,19 @@ public class CommonWordsController {
         WordSetDTO wordSetDTO = wordSetService.findWordSetById(id);
 
         return ResponseEntity.ok(wordSetDTO);
+    }
+
+    @PostMapping("/wordSet-solve/{wordSetId}")
+    public ResponseEntity<?> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
+        double score = wordSetService.solveWordSet(wordSetId, userAnswers, principal);
+
+        return ResponseEntity.ok("Your score: " + score);
+    }
+
+    @GetMapping("/words/score")
+    public ResponseEntity<List<WordSetResultDTO>> displayYourWordSetsScore(Principal principal) {
+        List<WordSetResultDTO> wordSetResultDTOS = wordService.findYourWordsResults(principal);
+
+        return ResponseEntity.ok(wordSetResultDTOS);
     }
 }

@@ -1,7 +1,5 @@
 package com.example.quiz_world.words.controller;
 
-import com.example.quiz_world.words.dto.WordSetResultDTO;
-import com.example.quiz_world.words.entity.AnswerToWordSet;
 import com.example.quiz_world.words.entity.Word;
 import com.example.quiz_world.words.entity.WordSet;
 import com.example.quiz_world.words.service.WordSetService;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -24,20 +21,6 @@ public class UserWordsController {
     public UserWordsController(WordsService wordService, WordSetService wordSetService) {
         this.wordService = wordService;
         this.wordSetService = wordSetService;
-    }
-
-    @GetMapping("/words/score")
-    public ResponseEntity<List<WordSetResultDTO>> displayYourWordSetsScore(Principal principal) {
-        List<WordSetResultDTO> wordSetResultDTOS = wordService.findYourWordsResults(principal);
-
-        return ResponseEntity.ok(wordSetResultDTOS);
-    }
-
-    @PostMapping("/wordSet-solve/{wordSetId}")
-    public ResponseEntity<?> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
-        double score = wordSetService.solveWordSet(wordSetId, userAnswers, principal);
-
-        return ResponseEntity.ok("Your score: " + score);
     }
 
     @Transactional

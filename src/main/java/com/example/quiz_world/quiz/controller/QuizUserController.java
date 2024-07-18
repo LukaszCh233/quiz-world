@@ -1,11 +1,8 @@
 package com.example.quiz_world.quiz.controller;
 
-import com.example.quiz_world.quiz.dto.QuizResultDTO;
 import com.example.quiz_world.quiz.entity.Question;
 import com.example.quiz_world.quiz.entity.Quiz;
-import com.example.quiz_world.quiz.entity.UserAnswer;
 import com.example.quiz_world.quiz.service.QuizQuestionService;
-import com.example.quiz_world.quiz.service.QuizResultService;
 import com.example.quiz_world.quiz.service.QuizService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -21,13 +17,10 @@ public class QuizUserController {
     private final QuizService quizService;
 
     private final QuizQuestionService quizQuestionService;
-    private final QuizResultService quizResultService;
 
-    public QuizUserController(QuizService quizService, QuizQuestionService quizQuestionService,
-                              QuizResultService quizResultService) {
+    public QuizUserController(QuizService quizService, QuizQuestionService quizQuestionService) {
         this.quizService = quizService;
         this.quizQuestionService = quizQuestionService;
-        this.quizResultService = quizResultService;
     }
 
     @DeleteMapping("/quizzes")
@@ -63,26 +56,5 @@ public class QuizUserController {
         quizQuestionService.updateQuestionByQuestionNumberForUser(quizId, questionNumber, questions, principal);
 
         return ResponseEntity.ok("Question updated");
-    }
-
-    @PostMapping("/quiz-solve/{quizId}")
-    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
-        double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
-
-        return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
-    }
-
-    @GetMapping("/quiz/score")
-    public ResponseEntity<List<QuizResultDTO>> displayYourQuizzesScore(Principal principal) {
-        List<QuizResultDTO> quizResultDTOS = quizResultService.findYourQuizzesResults(principal);
-
-        return ResponseEntity.ok(quizResultDTOS);
-    }
-
-    @GetMapping("/quiz/globalScore")
-    public ResponseEntity<List<QuizResultDTO>> displayQuizzesScore() {
-        List<QuizResultDTO> quizResultDTOS = quizResultService.findQuizzesResults();
-
-        return ResponseEntity.ok(quizResultDTOS);
     }
 }

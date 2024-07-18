@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class WordSetService {
@@ -124,7 +125,11 @@ public class WordSetService {
         if (wordSetList.isEmpty()) {
             throw new EntityNotFoundException("Not found word set with this category");
         }
-        return mapperEntity.mapWordSetListToWordSetListDTO(wordSetList);
+        List<WordSet> publicQuizzes = wordSetList.stream()
+                .filter(wordSet -> wordSet.getStatus().equals(Status.PUBLIC))
+                .collect(Collectors.toList());
+
+        return mapperEntity.mapWordSetListToWordSetListDTO(publicQuizzes);
     }
 
     public WordSetDTO findWordSetById(Long wordSetId) {
@@ -185,7 +190,7 @@ public class WordSetService {
         wordSetToUpdate.setWordSetCategory(wordSetCategory);
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
-         wordSetRepository.save(wordSetToUpdate);
+        wordSetRepository.save(wordSetToUpdate);
     }
 
     public void updateWordSetByIdForAdmin(Long id, WordSet wordSet) {
@@ -200,7 +205,7 @@ public class WordSetService {
         wordSetToUpdate.setWordSetCategory(wordSetCategory);
         wordSetToUpdate.setStatus(wordSet.getStatus());
 
-         wordSetRepository.save(wordSetToUpdate);
+        wordSetRepository.save(wordSetToUpdate);
     }
 
     @Transactional

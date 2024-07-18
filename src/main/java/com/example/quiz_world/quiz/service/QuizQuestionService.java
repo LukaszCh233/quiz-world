@@ -34,6 +34,12 @@ public class QuizQuestionService {
     public void addQuestionsToQuiz(Long quizId, Question question) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(() -> new EntityNotFoundException("Quiz not found"));
 
+        boolean questionNumberExists = quiz.getQuestions().stream()
+                .anyMatch(q -> q.getQuestionNumber().equals(question.getQuestionNumber()));
+
+        if (questionNumberExists) {
+            throw new IllegalArgumentException("Question number " + question.getQuestionNumber() + " already exists in this quiz");
+        }
         question.setQuiz(quiz);
         question.getAnswerToQuiz().forEach(answer -> answer.setQuestion(question));
         quiz.getQuestions().add(question);

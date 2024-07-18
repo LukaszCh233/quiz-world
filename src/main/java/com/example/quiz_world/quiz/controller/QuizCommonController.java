@@ -3,10 +3,13 @@ package com.example.quiz_world.quiz.controller;
 import com.example.quiz_world.quiz.dto.QuestionDTO;
 import com.example.quiz_world.quiz.dto.QuizCategoryDTO;
 import com.example.quiz_world.quiz.dto.QuizDTO;
+import com.example.quiz_world.quiz.dto.QuizResultDTO;
 import com.example.quiz_world.quiz.entity.Question;
 import com.example.quiz_world.quiz.entity.Quiz;
+import com.example.quiz_world.quiz.entity.UserAnswer;
 import com.example.quiz_world.quiz.service.QuizCategoryService;
 import com.example.quiz_world.quiz.service.QuizQuestionService;
+import com.example.quiz_world.quiz.service.QuizResultService;
 import com.example.quiz_world.quiz.service.QuizService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +25,14 @@ public class QuizCommonController {
     private final QuizService quizService;
     private final QuizCategoryService quizCategoryService;
     private final QuizQuestionService quizQuestionService;
+    private final QuizResultService quizResultService;
 
-    public QuizCommonController(QuizService quizService, QuizQuestionService quizQuestionService,
-                                QuizCategoryService quizCategoryService) {
+    public QuizCommonController(QuizService quizService, QuizCategoryService quizCategoryService,
+                                QuizQuestionService quizQuestionService, QuizResultService quizResultService) {
         this.quizService = quizService;
-        this.quizQuestionService = quizQuestionService;
         this.quizCategoryService = quizCategoryService;
+        this.quizQuestionService = quizQuestionService;
+        this.quizResultService = quizResultService;
     }
 
     @GetMapping("/quizzes")
@@ -57,6 +62,12 @@ public class QuizCommonController {
 
         return ResponseEntity.ok(createQuiz);
     }
+    @PostMapping("/quiz-solve/{quizId}")
+    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
+        double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
+
+        return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
+    }
 
     @PostMapping("/quiz/{quizId}/question")
     public ResponseEntity<?> addQuestionToQuiz(@PathVariable Long quizId, @Valid @RequestBody Question question) {
@@ -84,5 +95,18 @@ public class QuizCommonController {
         List<QuizCategoryDTO> quizCategoryDTOList = quizCategoryService.findAllQuizCategories();
 
         return ResponseEntity.ok(quizCategoryDTOList);
+    }
+    @GetMapping("/quiz/score")
+    public ResponseEntity<List<QuizResultDTO>> displayYourQuizzesScore(Principal principal) {
+        List<QuizResultDTO> quizResultDTOS = quizResultService.findYourQuizzesResults(principal);
+
+        return ResponseEntity.ok(quizResultDTOS);
+    }
+
+    @GetMapping("/quiz/globalScore")
+    public ResponseEntity<List<QuizResultDTO>> displayQuizzesScore() {
+        List<QuizResultDTO> quizResultDTOS = quizResultService.findQuizzesResults();
+
+        return ResponseEntity.ok(quizResultDTOS);
     }
 }

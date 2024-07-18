@@ -38,6 +38,12 @@ public class WordsService {
     public void addWordToWordSet(Long wordSetId, Word word) {
         WordSet wordSet = wordSetRepository.findById(wordSetId).orElseThrow(() -> new EntityNotFoundException("Not found word set"));
 
+        boolean wordNumberExists = wordSet.getWords().stream()
+                .anyMatch(w -> w.getWordNumber().equals(word.getWordNumber()));
+        if (wordNumberExists) {
+            throw new IllegalArgumentException("number " + word.getWordNumber() + " already exists in this quiz");
+        }
+
         word.setWordSet(wordSet);
         word.setWordNumber(word.getWordNumber());
         word.setWord(word.getWord());
@@ -85,7 +91,7 @@ public class WordsService {
         wordToUpdate.setWord(word.getWord());
         wordToUpdate.setTranslation(word.getTranslation());
 
-         wordRepository.save(wordToUpdate);
+        wordRepository.save(wordToUpdate);
     }
 
     public List<WordSetResultDTO> findYourWordsResults(Principal principal) {
@@ -107,7 +113,7 @@ public class WordsService {
         wordToUpdate.setWord(word.getWord());
         wordToUpdate.setTranslation(word.getTranslation());
 
-         wordRepository.save(wordToUpdate);
+        wordRepository.save(wordToUpdate);
     }
 
     public void deleteWordByNumberWordSetForAdmin(Long wordSetId, Long numberWord) {
