@@ -17,10 +17,8 @@ Admin who can manage the application and User who uses the application.
 - **Lombok**: To reduce boilerplate code by generating getters, setters, etc.
 - **Hibernate**: ORM framework used with Spring Data JPA.
 - **JSON Web Token (JWT)**: For authentication and authorization.
-- **Log4j**: For logging application events.
 - **PostgreSQL**: The relational database management system used.
 - **JUnit**: For unit testing.
-- **Mockito **: For testing.
 - **Spring Data REST WebMVC**: For creating RESTful APIs.
 - **Maven**
 - **IntelliJ IDEA**
@@ -29,22 +27,26 @@ Admin who can manage the application and User who uses the application.
 ## Prerequisites
 Before you begin, ensure you have the following installed on your machine:
 - **Java 17**: [Download and Install Java](https://adoptopenjdk.net/)
-- **postgreSQL**: https://www.postgresql.org/download/
-- **Maven**: https://maven.apache.org/download.cgi
-- **Git**: https://git-scm.com/downloads
 - **Postman**: https://www.postman.com/downloads/
+- **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
+- **Docker Compose**: [Install Docker Compose](https://docs.docker.com/compose/install/)
 
-## Configure Database
+## How to Run
+
+### 1. Clone the Repository
+
+First, clone the repository to your local machine:
+
 ```bash
-spring.application.name=quiz_World
-spring.datasource.url=jdbc:postgresql://localhost:5432/quiz_world
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-server.port=8080
-
+git clone https://github.com/LukaszCh233/quiz-world.git
+cd quiz-world
 ```
-1. Open pgAdmin 4
-2. Login to the administrator user of postgreSQL
-3. Use your username and password from configuration
-4. Create database quiz_World
+
+### 2. Build and Start the Containers
+
+```bash
+docker-compose up --build
+```
+
+
 
