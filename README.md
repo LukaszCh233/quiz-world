@@ -26,7 +26,6 @@ Admin who can manage the application and User who uses the application.
 
 ## Prerequisites
 Before you begin, ensure you have the following installed on your machine:
-- **Java 17**: [Download and Install Java](https://adoptopenjdk.net/)
 - **Postman**: https://www.postman.com/downloads/
 - **Docker**: [Install Docker](https://docs.docker.com/get-docker/)
 - **Docker Compose**: [Install Docker Compose](https://docs.docker.com/compose/install/)

@@ -39,7 +39,7 @@ public class QuizQuestionRepositoryTest {
 
     @Test
     public void findQuestionByQuizIdAndQuestionNumber_test() {
-        Question question = createQuestion("test",1L);
+        Question question = newQuestion("test",1L);
         Long quizId = question.getQuiz().getId();
 
         Optional<Question> foundQuestion = quizQuestionRepository.findByQuizIdAndQuestionNumber(quizId, question.getQuestionNumber());
@@ -48,7 +48,7 @@ public class QuizQuestionRepositoryTest {
         assertEquals(foundQuestion.get().getContent(), "test");
     }
 
-    private Question createQuestion(String content,Long questionNumber) {
+    private Question newQuestion(String content,Long questionNumber) {
         QuizCategory quizCategory = new QuizCategory(null, "TestCategory");
         quizCategoryRepository.save(quizCategory);
 
