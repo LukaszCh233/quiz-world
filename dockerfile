@@ -1,16 +1,20 @@
-# build
-FROM openjdk:19-jdk-slim AS build
+FROM maven:3.8.5-openjdk-17-slim AS build
 
-# Install Maven
-RUN apt-get update && \
-    apt-get install -y maven
-
-# Create catalog
 WORKDIR /app
 
-# Copy the project files to your catalog
-COPY pom.xml .
-COPY src ./src
+COPY ./pom.xml .
+COPY ./src ./src
 
-# Build an application
 RUN mvn clean package -DskipTests
+
+#RUN image
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY --from=build /app/target/quiz_world-*.jar quiz_world.jar
+EXPOSE 8080
+
+ENTRYPOINT [ "java" ]
+
+CMD ["-jar", "/app/quiz_world-0.0.1-SNAPSHOT.jar"]
