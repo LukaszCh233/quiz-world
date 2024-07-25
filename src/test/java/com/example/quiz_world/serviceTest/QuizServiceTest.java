@@ -1,4 +1,4 @@
-package com.example.quiz_world.serviceTest.quiz;
+package com.example.quiz_world.serviceTest;
 
 import com.example.quiz_world.quiz.dto.QuizDTO;
 import com.example.quiz_world.quiz.dto.QuizResultDTO;
@@ -11,7 +11,6 @@ import com.example.quiz_world.quiz.service.QuizResultService;
 import com.example.quiz_world.quiz.service.QuizService;
 import com.example.quiz_world.reslult.Result;
 import com.example.quiz_world.reslult.ResultRepository;
-import com.example.quiz_world.serviceTest.TestPrincipal;
 import com.example.quiz_world.user.entity.Role;
 import com.example.quiz_world.user.entity.Status;
 import com.example.quiz_world.user.entity.User;

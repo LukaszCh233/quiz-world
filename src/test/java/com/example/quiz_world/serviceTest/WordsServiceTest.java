@@ -1,4 +1,4 @@
-package com.example.quiz_world.serviceTest.words;
+package com.example.quiz_world.serviceTest;
 
 import com.example.quiz_world.reslult.Result;
 import com.example.quiz_world.reslult.ResultRepository;

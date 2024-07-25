@@ -1,4 +1,4 @@
-package com.example.quiz_world.serviceTest.user;
+package com.example.quiz_world.serviceTest;
 
 import com.example.quiz_world.user.dto.AdminDTO;
 import com.example.quiz_world.user.dto.UserDTO;
@@ -64,6 +64,7 @@ public class UserServiceTest {
 
         assertNotNull(token);
     }
+
     @Test
     public void whenAdminAuthorizationIsCorrectShouldGenerateToken_test() {
         newUser("admin@example.com", "adminPassword", Role.ADMIN);
@@ -82,15 +83,6 @@ public class UserServiceTest {
         user.setRole(role);
 
         userRepository.save(user);
-    }
 
-    private void newAdmin(String email, Role role) {
-        User admin = new User();
-        admin.setName("name");
-        admin.setEmail(email);
-        admin.setPassword("password");
-        admin.setRole(role);
-
-        userRepository.save(admin);
     }
 }
