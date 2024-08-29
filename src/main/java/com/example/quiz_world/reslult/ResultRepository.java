@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface ResultRepository extends JpaRepository<Result, Long> {
     void deleteByQuiz(Quiz quiz);
+    void deleteByQuizIn(List<Quiz> quizList);
 
     void deleteByWordSet(WordSet wordSet);
 

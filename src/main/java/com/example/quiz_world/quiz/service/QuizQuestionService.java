@@ -72,7 +72,7 @@ public class QuizQuestionService {
         quizQuestionRepository.delete(question);
     }
 
-    public Question updateQuestionByQuestionNumberForUser(Long quizId, Long questionNumber, Question
+    public void updateQuestionByQuestionNumberForUser(Long quizId, Long questionNumber, Question
             question, Principal principal) {
         String email = principal.getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
@@ -92,10 +92,10 @@ public class QuizQuestionService {
             answerToQuiz.setQuestion(questionToUpdate);
             questionToUpdate.getAnswerToQuiz().add(answerToQuiz);
         }
-        return quizQuestionRepository.save(questionToUpdate);
+        quizQuestionRepository.save(questionToUpdate);
     }
 
-    public Question updateQuestionByQuestionNumberForAdmin(Long quizId, Long questionNumber, Question question) {
+    public void updateQuestionByQuestionNumberForAdmin(Long quizId, Long questionNumber, Question question) {
         Question questionToUpdate = quizQuestionRepository.findByQuizIdAndQuestionNumber(quizId, questionNumber).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         questionToUpdate.setContent(question.getContent());
@@ -106,7 +106,7 @@ public class QuizQuestionService {
             answerToQuiz.setQuestion(questionToUpdate);
             questionToUpdate.getAnswerToQuiz().add(answerToQuiz);
         }
-        return quizQuestionRepository.save(questionToUpdate);
+        quizQuestionRepository.save(questionToUpdate);
     }
 
     public void deleteQuestionByNumberQuestionForAdmin(Long quizId, Long numberQuestion) {

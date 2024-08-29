@@ -39,9 +39,12 @@ public class QuizService {
     public QuizDTO createQuiz(String title, Long quizCategoryId, Status status, Principal principal) {
         String email = principal.getName();
 
-        QuizCategory category = quizCategoryRepository.findById(quizCategoryId).orElseThrow(() -> new EntityNotFoundException("category not found"));
-        Quiz quiz = new Quiz();
+        QuizCategory category = quizCategoryRepository.findById(quizCategoryId).orElseThrow(() ->
+                new EntityNotFoundException("category not found"));
+
         User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+
+        Quiz quiz = new Quiz();
         quiz.setTitle(title);
         quiz.setQuizCategory(category);
         quiz.setUserId(user.getId());
@@ -95,14 +98,7 @@ public class QuizService {
     @Transactional
     public void deleteAllQuizzesForUser(Principal principal) {
         List<Quiz> quizList = findQuizzesByUserPrincipal(principal);
-
-        if (quizList.isEmpty()) {
-            throw new EntityNotFoundException("List is empty");
-        }
-        for (Quiz quiz : quizList) {
-            resultRepository.deleteByQuiz(quiz);
-        }
-        quizRepository.deleteAll(quizList);
+        deleteQuizzes(quizList);
     }
 
     @Transactional
@@ -130,7 +126,8 @@ public class QuizService {
         if (quiz.getQuizCategory() == null) {
             throw new IllegalArgumentException("Quiz category cannot be null");
         }
-        QuizCategory quizCategory = quizCategoryRepository.findById(quiz.getQuizCategory().getId()).orElseThrow(() -> new EntityNotFoundException("Category not exists"));
+        QuizCategory quizCategory = quizCategoryRepository.findById(quiz.getQuizCategory().getId()).orElseThrow(() ->
+                new EntityNotFoundException("Category not exists"));
 
         quizToUpdate.setTitle(quiz.getTitle());
         quizToUpdate.setQuizCategory(quizCategory);
@@ -145,7 +142,8 @@ public class QuizService {
         if (quiz.getQuizCategory() == null) {
             throw new IllegalArgumentException("Quiz category cannot be null");
         }
-        QuizCategory quizCategory = quizCategoryRepository.findById(quiz.getQuizCategory().getId()).orElseThrow(() -> new EntityNotFoundException("Quiz category not exists"));
+        QuizCategory quizCategory = quizCategoryRepository.findById(quiz.getQuizCategory().getId()).orElseThrow(() ->
+                new EntityNotFoundException("Quiz category not exists"));
 
         quizToUpdate.setTitle(quiz.getTitle());
         quizToUpdate.setQuizCategory(quizCategory);
@@ -214,13 +212,7 @@ public class QuizService {
     @Transactional
     public void deleteAllQuizzesForAdmin() {
         List<Quiz> quizList = quizRepository.findAll();
-        if (quizList.isEmpty()) {
-            throw new EntityNotFoundException("Quiz list is empty");
-        }
-        for (Quiz quiz : quizList) {
-            resultRepository.deleteByQuiz(quiz);
-        }
-        quizRepository.deleteAll(quizList);
+        deleteQuizzes(quizList);
     }
 
     @Transactional
@@ -231,4 +223,13 @@ public class QuizService {
 
         quizRepository.delete(quizToDelete);
     }
+    private void deleteQuizzes(List<Quiz> quizList) {
+        if (quizList.isEmpty()) {
+            throw new EntityNotFoundException("Quiz list is empty");
+        }
+        resultRepository.deleteByQuizIn(quizList);
+
+        quizRepository.deleteAll(quizList);
+    }
+
 }
