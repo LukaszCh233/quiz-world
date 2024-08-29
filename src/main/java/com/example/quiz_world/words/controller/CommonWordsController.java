@@ -41,7 +41,7 @@ public class CommonWordsController {
     }
 
     @GetMapping("/wordSets")
-    public ResponseEntity<?> displayWordSets() {
+    public ResponseEntity<List<WordSetDTO>> displayWordSets() {
         List<WordSetDTO> wordSetDTOList = wordSetService.findPublicWordSets();
 
         return ResponseEntity.ok(wordSetDTOList);
@@ -55,7 +55,7 @@ public class CommonWordsController {
     }
 
     @PostMapping("/wordSet/{wordSetId}/word")
-    public ResponseEntity<?> addWordToWordSet(@PathVariable Long wordSetId, @Valid @RequestBody Word word) {
+    public ResponseEntity<String> addWordToWordSet(@PathVariable Long wordSetId, @Valid @RequestBody Word word) {
         wordService.addWordToWordSet(wordSetId, word);
 
         return ResponseEntity.ok("Word added to word set successfully");
@@ -69,28 +69,28 @@ public class CommonWordsController {
     }
 
     @GetMapping("/wordSets/category{categoryId}")
-    public ResponseEntity<?> displayWordSetsByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<List<WordSetDTO>> displayWordSetsByCategory(@PathVariable Long categoryId) {
         List<WordSetDTO> wordSetDTOS = wordSetService.findWordSetByCategory(categoryId);
 
         return ResponseEntity.ok(wordSetDTOS);
     }
 
     @GetMapping("/wordSet/{wordSetId}/words")
-    public ResponseEntity<?> displayWords(@PathVariable Long wordSetId) {
+    public ResponseEntity<List<WordDTO>> displayWords(@PathVariable Long wordSetId) {
         List<WordDTO> words = wordService.findWordsByWordSetId(wordSetId);
 
         return ResponseEntity.ok(words);
     }
 
     @GetMapping("/wordSet/{id}")
-    public ResponseEntity<?> displayWordSet(@PathVariable Long id) {
+    public ResponseEntity<WordSetDTO> displayWordSet(@PathVariable Long id) {
         WordSetDTO wordSetDTO = wordSetService.findWordSetById(id);
 
         return ResponseEntity.ok(wordSetDTO);
     }
 
     @PostMapping("/wordSet-solve/{wordSetId}")
-    public ResponseEntity<?> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
+    public ResponseEntity<String> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
         double score = wordSetService.solveWordSet(wordSetId, userAnswers, principal);
 
         return ResponseEntity.ok("Your score: " + score);

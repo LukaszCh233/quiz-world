@@ -24,35 +24,35 @@ public class QuizUserController {
     }
 
     @DeleteMapping("/quizzes")
-    public ResponseEntity<?> deleteYourQuizzes(Principal principal) {
+    public ResponseEntity<String> deleteYourQuizzes(Principal principal) {
         quizService.deleteAllQuizzesForUser(principal);
 
         return ResponseEntity.ok("All quizzes has been deleted");
     }
 
     @DeleteMapping("/quiz/{quizId}/question/{questionNumber}")
-    public ResponseEntity<?> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, Principal principal) {
+    public ResponseEntity<String> deleteQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, Principal principal) {
         quizQuestionService.deleteQuestionByNumberQuestionForUser(quizId, questionNumber, principal);
 
         return ResponseEntity.ok("Question has been deleted");
     }
 
     @DeleteMapping("/quiz/{quizId}")
-    public ResponseEntity<?> deleteYourQuiz(@PathVariable Long quizId, Principal principal) {
+    public ResponseEntity<String> deleteYourQuiz(@PathVariable Long quizId, Principal principal) {
         quizService.deleteQuizByIdForUser(quizId, principal);
 
         return ResponseEntity.ok("Quiz has been deleted");
     }
 
     @PutMapping("/quiz/{quizId}")
-    public ResponseEntity<?> updateYourQuiz(@PathVariable Long quizId, @Valid @RequestBody Quiz quiz, Principal principal) {
+    public ResponseEntity<String> updateYourQuiz(@PathVariable Long quizId, @Valid @RequestBody Quiz quiz, Principal principal) {
         quizService.updateQuizByIdForUser(quizId, quiz, principal);
 
         return ResponseEntity.ok("Quiz updated");
     }
 
     @PutMapping("/quiz/{quizId}/question/{questionNumber}")
-    public ResponseEntity<?> updateYourQuizQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, @Valid @RequestBody Question questions, Principal principal) {
+    public ResponseEntity<String> updateYourQuizQuestion(@PathVariable Long quizId, @PathVariable Long questionNumber, @Valid @RequestBody Question questions, Principal principal) {
         quizQuestionService.updateQuestionByQuestionNumberForUser(quizId, questionNumber, questions, principal);
 
         return ResponseEntity.ok("Question updated");

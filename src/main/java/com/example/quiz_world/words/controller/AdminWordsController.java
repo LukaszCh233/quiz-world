@@ -33,50 +33,58 @@ public class AdminWordsController {
     }
 
     @PutMapping("/wordSet/{wordSetId}")
-    public ResponseEntity<?> updateWordSet(@PathVariable Long wordSetId, @Valid @RequestBody WordSet wordSet) {
+    public ResponseEntity<String> updateWordSet(@PathVariable Long wordSetId, @Valid @RequestBody WordSet wordSet) {
         wordSetService.updateWordSetByIdForAdmin(wordSetId, wordSet);
+
         return ResponseEntity.ok("Word set updated");
     }
 
     @PutMapping("/wordSet/{wordSetId}/word/{wordNumber}")
-    public ResponseEntity<?> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, @Valid @RequestBody Word word) {
+    public ResponseEntity<String> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, @Valid @RequestBody Word word) {
         wordService.updateWordForAdmin(wordSetId, wordNumber, word);
+
         return ResponseEntity.ok("Word updated");
     }
 
     @DeleteMapping("/wordSets")
-    public ResponseEntity<?> deleteAllWordSets() {
+    public ResponseEntity<String> deleteAllWordSets() {
         wordSetService.deleteAllWordSetsForAdmin();
+
         return ResponseEntity.ok("All word sets has been deleted");
     }
 
     @DeleteMapping("/wordSet/{wordSetId}")
-    public ResponseEntity<?> deleteWordSet(@PathVariable Long wordSetId) {
+    public ResponseEntity<String> deleteWordSet(@PathVariable Long wordSetId) {
         wordSetService.deleteWordSetByIdForAdmin(wordSetId);
+
         return ResponseEntity.ok("Word set has been deleted");
     }
 
     @DeleteMapping("/wordSet/{wordSetId}/word/{wordNumber}")
-    public ResponseEntity<?> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber) {
+    public ResponseEntity<String> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber) {
         wordService.deleteWordByNumberWordSetForAdmin(wordSetId, wordNumber);
+
         return ResponseEntity.ok("Word has been deleted");
     }
 
     @DeleteMapping("/wordSet-category/{categoryId}")
-    public ResponseEntity<?> deleteWordSetCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<String> deleteWordSetCategory(@PathVariable Long categoryId) {
         wordSetCategoryService.deleteWordSetCategoryById(categoryId);
+
         return ResponseEntity.ok("Category has been deleted");
     }
 
     @DeleteMapping("/wordSet-categories")
-    public ResponseEntity<?> deleteAllWordSetCategories() {
+    public ResponseEntity<String> deleteAllWordSetCategories() {
         wordSetCategoryService.deleteAllWordSetCategories();
+
         return ResponseEntity.ok("All Categories has been deleted");
     }
 
     @PutMapping("/wordSet-category/{categoryId}")
-    public ResponseEntity<?> updateWordSetCategory(@PathVariable Long categoryId, @Valid @RequestBody WordSetCategory wordSetCategory) {
+    public ResponseEntity<WordSetCategory> updateWordSetCategory(@PathVariable Long categoryId, @Valid @RequestBody WordSetCategory wordSetCategory) {
         WordSetCategory updateCategory = wordSetCategoryService.updateWordSetCategory(categoryId, wordSetCategory);
+
         return ResponseEntity.ok(updateCategory);
     }
 }

@@ -36,21 +36,21 @@ public class QuizCommonController {
     }
 
     @GetMapping("/quizzes")
-    public ResponseEntity<?> displayQuizzes() {
+    public ResponseEntity<List<QuizDTO>> displayQuizzes() {
         List<QuizDTO> quizzes = quizService.findAllPublicQuizzes();
 
         return ResponseEntity.ok(quizzes);
     }
 
     @GetMapping("/quiz/{id}")
-    public ResponseEntity<?> displayQuiz(@PathVariable Long id) {
+    public ResponseEntity<QuizDTO> displayQuiz(@PathVariable Long id) {
         QuizDTO quizDTO = quizService.findQuizById(id);
 
         return ResponseEntity.ok(quizDTO);
     }
 
     @GetMapping("/quiz/{quizId}/questions")
-    public ResponseEntity<?> displayQuestions(@PathVariable Long quizId) {
+    public ResponseEntity<List<QuestionDTO>> displayQuestions(@PathVariable Long quizId) {
         List<QuestionDTO> questions = quizQuestionService.findQuestionsByQuizId(quizId);
 
         return ResponseEntity.ok(questions);
@@ -63,21 +63,21 @@ public class QuizCommonController {
         return ResponseEntity.ok(createQuiz);
     }
     @PostMapping("/quiz-solve/{quizId}")
-    public ResponseEntity<?> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
+    public ResponseEntity<String> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
         double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
 
         return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
     }
 
     @PostMapping("/quiz/{quizId}/question")
-    public ResponseEntity<?> addQuestionToQuiz(@PathVariable Long quizId, @Valid @RequestBody Question question) {
+    public ResponseEntity<String> addQuestionToQuiz(@PathVariable Long quizId, @Valid @RequestBody Question question) {
         quizQuestionService.addQuestionsToQuiz(quizId, question);
 
         return ResponseEntity.ok("Question added to quiz successfully");
     }
 
     @GetMapping("/user-quizzes")
-    public ResponseEntity<?> displayYourQuizzes(Principal principal) {
+    public ResponseEntity<List<QuizDTO>> displayYourQuizzes(Principal principal) {
         List<QuizDTO> quizzes = quizService.findYourQuizzes(principal);
 
         return ResponseEntity.ok(quizzes);
