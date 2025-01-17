@@ -1,13 +1,13 @@
 package com.example.quiz_world.repositoryTest.quiz;
 
-import com.example.quiz_world.quiz.entity.AnswerToQuiz;
-import com.example.quiz_world.quiz.entity.Question;
-import com.example.quiz_world.quiz.entity.Quiz;
-import com.example.quiz_world.quiz.entity.QuizCategory;
-import com.example.quiz_world.quiz.repository.QuizCategoryRepository;
-import com.example.quiz_world.quiz.repository.QuizQuestionRepository;
-import com.example.quiz_world.quiz.repository.QuizRepository;
-import com.example.quiz_world.user.entity.Status;
+import com.example.quiz_world.quiz.question.AnswerToQuiz;
+import com.example.quiz_world.quiz.question.Question;
+import com.example.quiz_world.quiz.quiz.Quiz;
+import com.example.quiz_world.quiz.quizCategory.QuizCategory;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryRepository;
+import com.example.quiz_world.quiz.question.QuizQuestionRepository;
+import com.example.quiz_world.quiz.quiz.QuizRepository;
+import com.example.quiz_world.account.user.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

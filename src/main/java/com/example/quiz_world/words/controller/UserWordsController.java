@@ -1,9 +1,9 @@
 package com.example.quiz_world.words.controller;
 
-import com.example.quiz_world.words.entity.Word;
-import com.example.quiz_world.words.entity.WordSet;
-import com.example.quiz_world.words.service.WordSetService;
-import com.example.quiz_world.words.service.WordsService;
+import com.example.quiz_world.words.word.Word;
+import com.example.quiz_world.words.word.WordsService;
+import com.example.quiz_world.words.wordSet.WordSet;
+import com.example.quiz_world.words.wordSet.WordSetService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

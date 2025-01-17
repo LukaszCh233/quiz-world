@@ -1,9 +1,9 @@
 package com.example.quiz_world.quiz.controller;
 
-import com.example.quiz_world.quiz.entity.Question;
-import com.example.quiz_world.quiz.entity.Quiz;
-import com.example.quiz_world.quiz.service.QuizQuestionService;
-import com.example.quiz_world.quiz.service.QuizService;
+import com.example.quiz_world.quiz.question.Question;
+import com.example.quiz_world.quiz.question.QuizQuestionService;
+import com.example.quiz_world.quiz.quiz.Quiz;
+import com.example.quiz_world.quiz.quiz.QuizService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,7 +15,6 @@ import java.security.Principal;
 @RequestMapping("/user")
 public class QuizUserController {
     private final QuizService quizService;
-
     private final QuizQuestionService quizQuestionService;
 
     public QuizUserController(QuizService quizService, QuizQuestionService quizQuestionService) {

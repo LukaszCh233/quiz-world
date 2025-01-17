@@ -1,16 +1,16 @@
 package com.example.quiz_world.quiz.controller;
 
-import com.example.quiz_world.quiz.dto.QuestionDTO;
-import com.example.quiz_world.quiz.dto.QuizCategoryDTO;
-import com.example.quiz_world.quiz.dto.QuizDTO;
-import com.example.quiz_world.quiz.dto.QuizResultDTO;
-import com.example.quiz_world.quiz.entity.Question;
-import com.example.quiz_world.quiz.entity.Quiz;
-import com.example.quiz_world.quiz.entity.UserAnswer;
-import com.example.quiz_world.quiz.service.QuizCategoryService;
-import com.example.quiz_world.quiz.service.QuizQuestionService;
-import com.example.quiz_world.quiz.service.QuizResultService;
-import com.example.quiz_world.quiz.service.QuizService;
+import com.example.quiz_world.quiz.question.Question;
+import com.example.quiz_world.quiz.question.QuestionDTO;
+import com.example.quiz_world.quiz.question.QuizQuestionService;
+import com.example.quiz_world.quiz.quiz.Quiz;
+import com.example.quiz_world.quiz.quiz.QuizDTO;
+import com.example.quiz_world.quiz.quiz.QuizService;
+import com.example.quiz_world.quiz.quiz.UserAnswer;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryDTO;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryService;
+import com.example.quiz_world.quiz.reslult.QuizResultDTO;
+import com.example.quiz_world.quiz.reslult.QuizResultService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -62,6 +62,7 @@ public class QuizCommonController {
 
         return ResponseEntity.ok(createQuiz);
     }
+
     @PostMapping("/quiz-solve/{quizId}")
     public ResponseEntity<String> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
         double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
@@ -96,6 +97,7 @@ public class QuizCommonController {
 
         return ResponseEntity.ok(quizCategoryDTOList);
     }
+
     @GetMapping("/quiz/score")
     public ResponseEntity<List<QuizResultDTO>> displayYourQuizzesScore(Principal principal) {
         List<QuizResultDTO> quizResultDTOS = quizResultService.findYourQuizzesResults(principal);

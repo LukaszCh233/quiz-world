@@ -1,12 +1,12 @@
 package com.example.quiz_world.repositoryTest.words;
 
-import com.example.quiz_world.user.entity.Status;
-import com.example.quiz_world.words.entity.Word;
-import com.example.quiz_world.words.entity.WordSet;
-import com.example.quiz_world.words.entity.WordSetCategory;
-import com.example.quiz_world.words.repository.WordRepository;
-import com.example.quiz_world.words.repository.WordSetCategoryRepository;
-import com.example.quiz_world.words.repository.WordSetRepository;
+import com.example.quiz_world.account.user.Status;
+import com.example.quiz_world.words.word.Word;
+import com.example.quiz_world.words.wordSet.WordSet;
+import com.example.quiz_world.words.wordSetCategory.WordSetCategory;
+import com.example.quiz_world.words.word.WordRepository;
+import com.example.quiz_world.words.wordSetCategory.WordSetCategoryRepository;
+import com.example.quiz_world.words.wordSet.WordSetRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

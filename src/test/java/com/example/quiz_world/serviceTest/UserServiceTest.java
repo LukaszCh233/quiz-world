@@ -1,12 +1,12 @@
 package com.example.quiz_world.serviceTest;
 
-import com.example.quiz_world.user.dto.AdminDTO;
-import com.example.quiz_world.user.dto.UserDTO;
-import com.example.quiz_world.user.entity.LoginRequest;
-import com.example.quiz_world.user.entity.Role;
-import com.example.quiz_world.user.entity.User;
-import com.example.quiz_world.user.repository.UserRepository;
-import com.example.quiz_world.user.service.UserService;
+import com.example.quiz_world.account.user.AdminDTO;
+import com.example.quiz_world.account.user.UserDTO;
+import com.example.quiz_world.account.user.LoginRequest;
+import com.example.quiz_world.account.user.Role;
+import com.example.quiz_world.account.user.User;
+import com.example.quiz_world.account.user.UserRepository;
+import com.example.quiz_world.account.user.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

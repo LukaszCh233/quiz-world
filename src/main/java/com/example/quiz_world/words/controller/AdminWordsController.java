@@ -1,11 +1,11 @@
 package com.example.quiz_world.words.controller;
 
-import com.example.quiz_world.words.entity.Word;
-import com.example.quiz_world.words.entity.WordSet;
-import com.example.quiz_world.words.entity.WordSetCategory;
-import com.example.quiz_world.words.service.WordSetCategoryService;
-import com.example.quiz_world.words.service.WordSetService;
-import com.example.quiz_world.words.service.WordsService;
+import com.example.quiz_world.words.word.Word;
+import com.example.quiz_world.words.word.WordsService;
+import com.example.quiz_world.words.wordSet.WordSet;
+import com.example.quiz_world.words.wordSet.WordSetService;
+import com.example.quiz_world.words.wordSetCategory.WordSetCategory;
+import com.example.quiz_world.words.wordSetCategory.WordSetCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

@@ -1,7 +1,7 @@
 package com.example.quiz_world.config;
 
-import com.example.quiz_world.user.entity.User;
-import com.example.quiz_world.user.repository.UserRepository;
+import com.example.quiz_world.account.user.User;
+import com.example.quiz_world.account.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

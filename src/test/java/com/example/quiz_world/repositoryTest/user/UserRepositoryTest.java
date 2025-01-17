@@ -1,8 +1,8 @@
 package com.example.quiz_world.repositoryTest.user;
 
-import com.example.quiz_world.user.entity.Role;
-import com.example.quiz_world.user.entity.User;
-import com.example.quiz_world.user.repository.UserRepository;
+import com.example.quiz_world.account.user.Role;
+import com.example.quiz_world.account.user.User;
+import com.example.quiz_world.account.user.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
