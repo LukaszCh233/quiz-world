@@ -1,7 +1,7 @@
 package com.example.quiz_world.words.controller;
 
-import com.example.quiz_world.words.word.Word;
 import com.example.quiz_world.words.word.WordDTO;
+import com.example.quiz_world.words.word.WordRequest;
 import com.example.quiz_world.words.word.WordsService;
 import com.example.quiz_world.words.wordSet.*;
 import com.example.quiz_world.words.wordSetCategory.WordSetCategoryDTO;
@@ -44,14 +44,15 @@ public class CommonWordsController {
     }
 
     @PostMapping("/wordSet")
-    public ResponseEntity<WordSetDTO> createWordSet(@Valid @RequestBody WordSet wordSet, Principal principal) {
-        WordSetDTO createWordSet = wordSetService.createWordSet(wordSet.getTitle(), wordSet.getWordSetCategory().getId(), wordSet.getStatus(), principal);
+    public ResponseEntity<WordSetDTO> createWordSet(@Valid @RequestBody WordSetRequest wordSetRequest,
+                                                    Principal principal) {
+        WordSetDTO createWordSet = wordSetService.createWordSet(wordSetRequest, principal);
 
         return ResponseEntity.ok(createWordSet);
     }
 
     @PostMapping("/wordSet/{wordSetId}/word")
-    public ResponseEntity<String> addWordToWordSet(@PathVariable Long wordSetId, @Valid @RequestBody Word word) {
+    public ResponseEntity<String> addWordToWordSet(@PathVariable Long wordSetId, @Valid @RequestBody WordRequest word) {
         wordService.addWordToWordSet(wordSetId, word);
 
         return ResponseEntity.ok("Word added to word set successfully");
@@ -59,14 +60,14 @@ public class CommonWordsController {
 
     @GetMapping("/user-WordSets")
     public ResponseEntity<List<WordSetDTO>> displayYourWordSets(Principal principal) {
-        List<WordSetDTO> wordSetDTOS = wordSetService.findYourWordSets(principal);
+        List<WordSetDTO> wordSetDTOS = wordSetService.findWordSetsByUserPrincipal(principal);
 
         return ResponseEntity.ok(wordSetDTOS);
     }
 
     @GetMapping("/wordSets/category{categoryId}")
     public ResponseEntity<List<WordSetDTO>> displayWordSetsByCategory(@PathVariable Long categoryId) {
-        List<WordSetDTO> wordSetDTOS = wordSetService.findWordSetByCategory(categoryId);
+        List<WordSetDTO> wordSetDTOS = wordSetService.findWordSetByCategoryId(categoryId);
 
         return ResponseEntity.ok(wordSetDTOS);
     }
@@ -86,7 +87,9 @@ public class CommonWordsController {
     }
 
     @PostMapping("/wordSet-solve/{wordSetId}")
-    public ResponseEntity<String> solveFLashCard(@PathVariable Long wordSetId, @RequestBody List<AnswerToWordSet> userAnswers, Principal principal) {
+    public ResponseEntity<String> solveFLashCard(@PathVariable Long wordSetId,
+                                                 @RequestBody @Valid List<AnswerToWordSet> userAnswers,
+                                                 Principal principal) {
         double score = wordSetService.solveWordSet(wordSetId, userAnswers, principal);
 
         return ResponseEntity.ok("Your score: " + score);

@@ -6,16 +6,11 @@ import com.example.quiz_world.account.user.Role;
 import com.example.quiz_world.account.user.Status;
 import com.example.quiz_world.account.user.User;
 import com.example.quiz_world.account.user.UserRepository;
-import com.example.quiz_world.words.wordSet.WordSetDTO;
-import com.example.quiz_world.words.wordSet.WordSetResultDTO;
-import com.example.quiz_world.words.wordSet.AnswerToWordSet;
+import com.example.quiz_world.words.wordSet.*;
 import com.example.quiz_world.words.word.Word;
-import com.example.quiz_world.words.wordSet.WordSet;
 import com.example.quiz_world.words.wordSetCategory.WordSetCategory;
 import com.example.quiz_world.words.word.WordRepository;
 import com.example.quiz_world.words.wordSetCategory.WordSetCategoryRepository;
-import com.example.quiz_world.words.wordSet.WordSetRepository;
-import com.example.quiz_world.words.wordSet.WordSetService;
 import com.example.quiz_world.words.word.WordsService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +66,7 @@ public class WordsServiceTest {
         newWordSet("mine", "user@example.com");
         newWordSet("someone", "other@example.com");
 
-        List<WordSetDTO> userWordSets = wordSetService.findYourWordSets(new TestPrincipal("user@example.com"));
+        List<WordSetDTO> userWordSets = wordSetService.findWordSetsByUserPrincipal(new TestPrincipal("user@example.com"));
 
         Assertions.assertEquals(userWordSets.size(), 1);
         Assertions.assertEquals(userWordSets.get(0).title(), "mine");
@@ -182,13 +177,12 @@ public class WordsServiceTest {
         WordSetCategory wordSetCategory = new WordSetCategory(null, "TestCategory");
         wordSetCategoryRepository.save(wordSetCategory);
 
-        WordSet wordSet = new WordSet();
-        wordSet.setWordSetCategory(wordSetCategory);
-        wordSet.setTitle(title);
-        wordSet.setUserId(1L);
-        wordSet.setStatus(Status.PUBLIC);
+        WordSetRequest wordSetRequest = new WordSetRequest();
+        wordSetRequest.setWordSetCategoryId(wordSetCategory.getId());
+        wordSetRequest.setTitle(title);
+        wordSetRequest.setStatus(Status.PUBLIC);
 
-        return wordSetService.createWordSet(wordSet.getTitle(), wordSetCategory.getId(), wordSet.getStatus(), new TestPrincipal(email
+        return wordSetService.createWordSet(wordSetRequest, new TestPrincipal(email
         ));
     }
 

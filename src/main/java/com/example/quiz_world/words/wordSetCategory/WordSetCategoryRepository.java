@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface WordSetCategoryRepository extends JpaRepository<WordSetCategory, Long> {
     @Query("SELECT w FROM WordSetCategory w WHERE LOWER(w.name) = LOWER(:name)")
     Optional<WordSetCategory> findByNameIgnoreCase(@Param("name") String name);
+
+    boolean existsByName(String name);
 }

@@ -1,10 +1,11 @@
 package com.example.quiz_world.words.controller;
 
-import com.example.quiz_world.words.word.Word;
+import com.example.quiz_world.words.word.WordRequest;
 import com.example.quiz_world.words.word.WordsService;
-import com.example.quiz_world.words.wordSet.WordSet;
+import com.example.quiz_world.words.wordSet.WordSetRequest;
 import com.example.quiz_world.words.wordSet.WordSetService;
-import com.example.quiz_world.words.wordSetCategory.WordSetCategory;
+import com.example.quiz_world.words.wordSetCategory.WordSetCategoryDTO;
+import com.example.quiz_world.words.wordSetCategory.WordSetCategoryRequest;
 import com.example.quiz_world.words.wordSetCategory.WordSetCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,24 +27,27 @@ public class AdminWordsController {
     }
 
     @PostMapping("/wordSet-category")
-    public ResponseEntity<WordSetCategory> createWordSetCategory(@Valid @RequestBody WordSetCategory wordSetCategory) {
-        WordSetCategory createWordSetCategory = wordSetCategoryService.createWordSetCategory(wordSetCategory);
+    public ResponseEntity<WordSetCategoryDTO> createWordSetCategory(@Valid @RequestBody
+                                                                    WordSetCategoryRequest wordSetCategoryRequest) {
+        WordSetCategoryDTO createWordSetCategory = wordSetCategoryService.createWordSetCategory(wordSetCategoryRequest);
 
         return ResponseEntity.ok(createWordSetCategory);
     }
 
     @PutMapping("/wordSet/{wordSetId}")
-    public ResponseEntity<String> updateWordSet(@PathVariable Long wordSetId, @Valid @RequestBody WordSet wordSet) {
-        wordSetService.updateWordSetByIdForAdmin(wordSetId, wordSet);
+    public ResponseEntity<String> updateWordSet(@PathVariable Long wordSetId,
+                                                @Valid @RequestBody WordSetRequest wordSetRequest) {
+        wordSetService.updateWordSetByIdForAdmin(wordSetId, wordSetRequest);
 
         return ResponseEntity.ok("Word set updated");
     }
 
     @PutMapping("/wordSet/{wordSetId}/word/{wordNumber}")
-    public ResponseEntity<String> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber, @Valid @RequestBody Word word) {
-        wordService.updateWordForAdmin(wordSetId, wordNumber, word);
+    public ResponseEntity<String> updateWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber,
+                                             @Valid @RequestBody WordRequest wordRequest) {
+        wordService.updateWordForAdmin(wordSetId, wordNumber, wordRequest);
 
-        return ResponseEntity.ok("Word updated");
+        return ResponseEntity.ok("Word has been updated");
     }
 
     @DeleteMapping("/wordSets")
@@ -62,7 +66,7 @@ public class AdminWordsController {
 
     @DeleteMapping("/wordSet/{wordSetId}/word/{wordNumber}")
     public ResponseEntity<String> deleteWord(@PathVariable Long wordSetId, @PathVariable Long wordNumber) {
-        wordService.deleteWordByNumberWordSetForAdmin(wordSetId, wordNumber);
+        wordService.deleteWordByNumberAndWordSetForAdmin(wordSetId, wordNumber);
 
         return ResponseEntity.ok("Word has been deleted");
     }
@@ -82,8 +86,9 @@ public class AdminWordsController {
     }
 
     @PutMapping("/wordSet-category/{categoryId}")
-    public ResponseEntity<WordSetCategory> updateWordSetCategory(@PathVariable Long categoryId, @Valid @RequestBody WordSetCategory wordSetCategory) {
-        WordSetCategory updateCategory = wordSetCategoryService.updateWordSetCategory(categoryId, wordSetCategory);
+    public ResponseEntity<WordSetCategoryDTO> updateWordSetCategory(@PathVariable Long categoryId,
+                                                                    @Valid @PathVariable WordSetCategoryRequest wordSetCategory) {
+        WordSetCategoryDTO updateCategory = wordSetCategoryService.updateWordSetCategory(categoryId, wordSetCategory);
 
         return ResponseEntity.ok(updateCategory);
     }

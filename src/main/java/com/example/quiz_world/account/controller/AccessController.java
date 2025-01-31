@@ -1,10 +1,6 @@
 package com.example.quiz_world.account.controller;
 
-import com.example.quiz_world.account.user.AdminDTO;
-import com.example.quiz_world.account.user.UserDTO;
-import com.example.quiz_world.account.user.LoginRequest;
-import com.example.quiz_world.account.user.User;
-import com.example.quiz_world.account.user.UserService;
+import com.example.quiz_world.account.user.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

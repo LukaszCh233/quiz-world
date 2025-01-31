@@ -1,20 +1,20 @@
 package com.example.quiz_world.serviceTest;
 
-import com.example.quiz_world.quiz.question.AnswerToQuiz;
-import com.example.quiz_world.quiz.quiz.*;
-import com.example.quiz_world.quiz.reslult.QuizResultDTO;
-import com.example.quiz_world.quiz.question.Question;
-import com.example.quiz_world.quiz.quizCategory.QuizCategory;
-import com.example.quiz_world.quiz.quizCategory.QuizCategoryRepository;
-import com.example.quiz_world.quiz.question.QuizQuestionRepository;
-import com.example.quiz_world.quiz.quizCategory.QuizCategoryService;
-import com.example.quiz_world.quiz.reslult.QuizResultService;
-import com.example.quiz_world.quiz.reslult.Result;
-import com.example.quiz_world.quiz.reslult.ResultRepository;
 import com.example.quiz_world.account.user.Role;
 import com.example.quiz_world.account.user.Status;
 import com.example.quiz_world.account.user.User;
 import com.example.quiz_world.account.user.UserRepository;
+import com.example.quiz_world.quiz.question.AnswerToQuiz;
+import com.example.quiz_world.quiz.question.Question;
+import com.example.quiz_world.quiz.question.QuizQuestionRepository;
+import com.example.quiz_world.quiz.quiz.*;
+import com.example.quiz_world.quiz.quizCategory.QuizCategory;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryRepository;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryService;
+import com.example.quiz_world.quiz.reslult.QuizResultDTO;
+import com.example.quiz_world.quiz.reslult.QuizResultService;
+import com.example.quiz_world.quiz.reslult.Result;
+import com.example.quiz_world.quiz.reslult.ResultRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ public class QuizServiceTest {
         newQuiz("mine", "user@example.com");
         newQuiz("someone", "other@example.com");
 
-        List<QuizDTO> userQuizzes = quizService.findYourQuizzes(new TestPrincipal("user@example.com"));
+        List<QuizDTO> userQuizzes = quizService.findQuizzesByUserPrincipal(new TestPrincipal("user@example.com"));
 
         Assertions.assertEquals(userQuizzes.size(), 1);
         Assertions.assertEquals(userQuizzes.get(0).title(), "mine");
@@ -170,7 +170,7 @@ public class QuizServiceTest {
 
         Quiz quiz = new Quiz();
         quiz.setTitle(title);
-        quiz.setUserId(null);
+        quiz.setUserId(1L);
         quiz.setQuizCategory(quizCategory);
         quiz.setStatus(status);
         quizRepository.save(quiz);
@@ -246,14 +246,12 @@ public class QuizServiceTest {
         QuizCategory quizCategory = new QuizCategory(null, "TestCategory");
         quizCategoryRepository.save(quizCategory);
 
-        Quiz quiz = new Quiz();
-        quiz.setTitle(title);
-        quiz.setUserId(null);
-        quiz.setQuizCategory(quizCategory);
-        quiz.setStatus(Status.PUBLIC);
+        QuizRequest quizRequest = new QuizRequest();
+        quizRequest.setTitle(title);
+        quizRequest.setQuizCategoryId(quizCategory.getId());
+        quizRequest.setStatus(Status.PUBLIC);
 
-        return quizService.createQuiz(quiz.getTitle(), quizCategory.getId(), quiz.getStatus(), new TestPrincipal(email
-        ));
+        return quizService.createQuiz(quizRequest, new TestPrincipal(email));
     }
 
     private void deleteOwnQuizzes() {

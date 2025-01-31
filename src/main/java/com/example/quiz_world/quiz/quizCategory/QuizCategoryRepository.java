@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface QuizCategoryRepository extends JpaRepository<QuizCategory, Long> {
     @Query("SELECT q FROM QuizCategory q WHERE LOWER(q.name) = LOWER(:name)")
     Optional<QuizCategory> findByNameIgnoreCase(@Param("name") String name);
+
+    boolean existsByName(String name);
 }

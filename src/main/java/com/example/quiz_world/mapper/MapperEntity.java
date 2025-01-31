@@ -1,5 +1,8 @@
 package com.example.quiz_world.mapper;
 
+import com.example.quiz_world.account.user.AdminDTO;
+import com.example.quiz_world.account.user.User;
+import com.example.quiz_world.account.user.UserDTO;
 import com.example.quiz_world.quiz.question.AnswerToQuiz;
 import com.example.quiz_world.quiz.question.AnswerToQuizDTO;
 import com.example.quiz_world.quiz.question.Question;
@@ -10,9 +13,6 @@ import com.example.quiz_world.quiz.quizCategory.QuizCategory;
 import com.example.quiz_world.quiz.quizCategory.QuizCategoryDTO;
 import com.example.quiz_world.quiz.reslult.QuizResultDTO;
 import com.example.quiz_world.quiz.reslult.Result;
-import com.example.quiz_world.account.user.AdminDTO;
-import com.example.quiz_world.account.user.UserDTO;
-import com.example.quiz_world.account.user.User;
 import com.example.quiz_world.words.word.Word;
 import com.example.quiz_world.words.word.WordDTO;
 import com.example.quiz_world.words.wordSet.WordSet;
@@ -62,17 +62,17 @@ public class MapperEntity {
                 .collect(Collectors.toList());
     }
 
-    QuizCategoryDTO mapQuizCategoryToQuizCategoryDTO(QuizCategory quizCategory) {
+    public QuizCategoryDTO mapQuizCategoryToQuizCategoryDTO(QuizCategory quizCategory) {
         return new QuizCategoryDTO(quizCategory.getName());
     }
 
-    QuestionDTO mapQuestionToQuestionDTO(Question question) {
+    public QuestionDTO mapQuestionToQuestionDTO(Question question) {
         List<AnswerToQuizDTO> answerToQuizDTOList = mapAnswersToAnswerDTO(question.getAnswerToQuiz());
 
         return new QuestionDTO(question.getQuestionNumber(), question.getContent(), answerToQuizDTOList);
     }
 
-    List<AnswerToQuizDTO> mapAnswersToAnswerDTO(List<AnswerToQuiz> answerToQuizList) {
+    public List<AnswerToQuizDTO> mapAnswersToAnswerDTO(List<AnswerToQuiz> answerToQuizList) {
         List<AnswerToQuizDTO> answerToQuizDTOList = new ArrayList<>();
 
         for (AnswerToQuiz answerToQuiz : answerToQuizList) {
@@ -82,7 +82,7 @@ public class MapperEntity {
         return answerToQuizDTOList;
     }
 
-    QuizResultDTO mapQuizResultToQuizResultDTO(Result result) {
+    public QuizResultDTO mapQuizResultToQuizResultDTO(Result result) {
         return new QuizResultDTO(result.getUser().getName(), result.getQuiz().getTitle(), result.getScore());
     }
 
@@ -92,7 +92,7 @@ public class MapperEntity {
                 .collect(Collectors.toList());
     }
 
-    WordSetResultDTO mapWordSetResultToWordSetResultDTO(Result result) {
+    public WordSetResultDTO mapWordSetResultToWordSetResultDTO(Result result) {
         return new WordSetResultDTO(result.getUser().getName(), result.getWordSet().getTitle(), result.getScore());
     }
 
@@ -126,7 +126,7 @@ public class MapperEntity {
                 .collect(Collectors.toList());
     }
 
-    WordDTO mapWordToWordDTO(Word word) {
+    public WordDTO mapWordToWordDTO(Word word) {
         return new WordDTO(word.getWordNumber(), word.getWord());
     }
 

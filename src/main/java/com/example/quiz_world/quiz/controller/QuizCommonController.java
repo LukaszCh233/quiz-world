@@ -3,8 +3,8 @@ package com.example.quiz_world.quiz.controller;
 import com.example.quiz_world.quiz.question.Question;
 import com.example.quiz_world.quiz.question.QuestionDTO;
 import com.example.quiz_world.quiz.question.QuizQuestionService;
-import com.example.quiz_world.quiz.quiz.Quiz;
 import com.example.quiz_world.quiz.quiz.QuizDTO;
+import com.example.quiz_world.quiz.quiz.QuizRequest;
 import com.example.quiz_world.quiz.quiz.QuizService;
 import com.example.quiz_world.quiz.quiz.UserAnswer;
 import com.example.quiz_world.quiz.quizCategory.QuizCategoryDTO;
@@ -57,14 +57,16 @@ public class QuizCommonController {
     }
 
     @PostMapping("/quiz")
-    public ResponseEntity<QuizDTO> createQuiz(@Valid @RequestBody Quiz quiz, Principal principal) {
-        QuizDTO createQuiz = quizService.createQuiz(quiz.getTitle(), quiz.getQuizCategory().getId(), quiz.getStatus(), principal);
+    public ResponseEntity<QuizDTO> createQuiz(@Valid @RequestBody QuizRequest quizRequest, Principal principal) {
+        QuizDTO createQuiz = quizService.createQuiz(quizRequest, principal);
 
         return ResponseEntity.ok(createQuiz);
     }
 
     @PostMapping("/quiz-solve/{quizId}")
-    public ResponseEntity<String> solveQuiz(@PathVariable Long quizId, @RequestBody List<UserAnswer> userAnswersToQuiz, Principal principal) {
+    public ResponseEntity<String> solveQuiz(@PathVariable Long quizId,
+                                            @RequestBody @Valid List<UserAnswer> userAnswersToQuiz,
+                                            Principal principal) {
         double score = quizService.solveQuiz(quizId, userAnswersToQuiz, principal);
 
         return ResponseEntity.ok("Quiz solved successfully. Your score: " + score);
@@ -79,7 +81,7 @@ public class QuizCommonController {
 
     @GetMapping("/user-quizzes")
     public ResponseEntity<List<QuizDTO>> displayYourQuizzes(Principal principal) {
-        List<QuizDTO> quizzes = quizService.findYourQuizzes(principal);
+        List<QuizDTO> quizzes = quizService.findQuizzesByUserPrincipal(principal);
 
         return ResponseEntity.ok(quizzes);
     }

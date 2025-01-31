@@ -2,9 +2,10 @@ package com.example.quiz_world.quiz.controller;
 
 import com.example.quiz_world.quiz.question.Question;
 import com.example.quiz_world.quiz.question.QuizQuestionService;
-import com.example.quiz_world.quiz.quiz.Quiz;
+import com.example.quiz_world.quiz.quiz.QuizRequest;
 import com.example.quiz_world.quiz.quiz.QuizService;
-import com.example.quiz_world.quiz.quizCategory.QuizCategory;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryDTO;
+import com.example.quiz_world.quiz.quizCategory.QuizCategoryRequest;
 import com.example.quiz_world.quiz.quizCategory.QuizCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +27,9 @@ public class QuizAdminController {
     }
 
     @PutMapping("/quiz-category/{categoryId}")
-    public ResponseEntity<QuizCategory> updateQuizCategory(@PathVariable Long categoryId, @Valid @RequestBody QuizCategory quizCategory) {
-        QuizCategory updateCategory = quizCategoryService.updateQuizCategory(categoryId, quizCategory);
+    public ResponseEntity<QuizCategoryDTO> updateQuizCategory(@PathVariable Long categoryId,
+                                                              @Valid @RequestBody QuizCategoryRequest quizCategoryRequest) {
+        QuizCategoryDTO updateCategory = quizCategoryService.updateQuizCategory(categoryId, quizCategoryRequest);
 
         return ResponseEntity.ok(updateCategory);
     }
@@ -47,22 +49,23 @@ public class QuizAdminController {
     }
 
     @PutMapping("/quiz/{quizId}")
-    public ResponseEntity<String> updateQuiz(@PathVariable Long quizId, @Valid @RequestBody Quiz quiz) {
-        quizService.updateQuizByIdForAdmin(quizId, quiz);
+    public ResponseEntity<String> updateQuiz(@PathVariable Long quizId, @Valid @RequestBody QuizRequest quizRequest) {
+        quizService.updateQuizByIdForAdmin(quizId, quizRequest);
 
         return ResponseEntity.ok("Quiz updated");
     }
 
     @PutMapping("/quiz/{quizId}/question/{questionNumber}")
-    public ResponseEntity<String> updateQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber, @Valid @RequestBody Question question) {
+    public ResponseEntity<String> updateQuizQuestions(@PathVariable Long quizId, @PathVariable Long questionNumber,
+                                                      @Valid @RequestBody Question question) {
         quizQuestionService.updateQuestionByQuestionNumberForAdmin(quizId, questionNumber, question);
 
         return ResponseEntity.ok("Question updated");
     }
 
     @PostMapping("/quiz-category")
-    public ResponseEntity<QuizCategory> addQuizCategory(@Valid @RequestBody QuizCategory quizCategory) {
-        QuizCategory createQuizCategory = quizCategoryService.createQuizCategory(quizCategory);
+    public ResponseEntity<QuizCategoryDTO> addQuizCategory(@Valid @RequestBody QuizCategoryRequest quizCategoryRequest) {
+        QuizCategoryDTO createQuizCategory = quizCategoryService.createQuizCategory(quizCategoryRequest);
 
         return ResponseEntity.ok(createQuizCategory);
     }

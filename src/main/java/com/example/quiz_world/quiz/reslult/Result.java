@@ -1,7 +1,7 @@
 package com.example.quiz_world.quiz.reslult;
 
-import com.example.quiz_world.quiz.quiz.Quiz;
 import com.example.quiz_world.account.user.User;
+import com.example.quiz_world.quiz.quiz.Quiz;
 import com.example.quiz_world.words.wordSet.WordSet;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +19,7 @@ public class Result {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
     @ManyToOne

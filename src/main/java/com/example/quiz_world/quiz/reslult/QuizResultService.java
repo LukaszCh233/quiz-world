@@ -1,8 +1,8 @@
 package com.example.quiz_world.quiz.reslult;
 
-import com.example.quiz_world.mapper.MapperEntity;
 import com.example.quiz_world.account.user.User;
 import com.example.quiz_world.account.user.UserRepository;
+import com.example.quiz_world.mapper.MapperEntity;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class QuizResultService {
 
     public List<QuizResultDTO> findYourQuizzesResults(Principal principal) {
         String email = principal.getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("Not found user"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         List<Result> results = resultRepository.findByUserId(user.getId());
         if (results.isEmpty()) {
